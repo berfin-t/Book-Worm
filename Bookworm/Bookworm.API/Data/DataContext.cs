@@ -37,6 +37,9 @@ namespace Bookworm.API.Data
                     Isbn = "9780743273565",
                     Price = 10.99m,
                     Stock = 100,
+                    Description = "A novel set in the Roaring Twenties.",
+                    IsActive = true,
+                    ImgUrl = "2.jpg",
                     CategoryId = 1
                 },
                 new Book
@@ -47,6 +50,9 @@ namespace Bookworm.API.Data
                     Isbn = "9780441013593",
                     Price = 9.99m,
                     Stock = 50,
+                    Description = "A science fiction novel about politics and power.",
+                    IsActive = true,
+                    ImgUrl = "3.jpg",
                     CategoryId = 2
                 },
                 new Book
@@ -57,6 +63,9 @@ namespace Bookworm.API.Data
                     Isbn = "9780062316097",
                     Price = 14.99m,
                     Stock = 75,
+                    Description = "A book exploring the history and impact.",
+                    IsActive = false,
+                    ImgUrl = "1.jpg",
                     CategoryId = 3
                 },
                 new Book
@@ -67,6 +76,9 @@ namespace Bookworm.API.Data
                     Isbn = "9780451524935",
                     Price = 8.99m,
                     Stock = 120,
+                    Description = "A dystopian novel about totalitarianism.",
+                    IsActive = true,
+                    ImgUrl = "4.jpg",
                     CategoryId = 2
                 }
             );
