@@ -57,7 +57,7 @@ export default function Book({ book }: Props) {
                     startIcon={<AddShoppingCart />}
                     loading={loading}
                     onClick={() => handleAddItem(book.id)}>Sepete Ekle</LoadingButton>
-                    <Button component={Link} to={`/catalog/${book.id}`} variant="outlined" size="small" startIcon={<SearchIcon />}>View</Button>
+                    <Button component={Link} to={`/book/${book.id}`} variant="outlined" size="small" startIcon={<SearchIcon />}>View</Button>
             </CardActions>
         </Card>
     );

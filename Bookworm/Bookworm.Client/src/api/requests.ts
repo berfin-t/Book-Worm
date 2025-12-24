@@ -10,9 +10,9 @@ const queries = {
     delete: (url: string) => axios.delete(url).then((response: AxiosResponse) => response.data),
 }
 
-const Catalog = {
+const Book = {
     list: () => queries.get("book"),
-    details: (id: number) => queries.get(`books/${id}`)
+    details: (id: number) => queries.get(`book/${id}`)
 }
 
 const Cart = {
@@ -22,7 +22,8 @@ const Cart = {
 }
 
 const requests = {
-    Catalog, Cart
+    Book,
+    Cart
 }
 export default requests 
 

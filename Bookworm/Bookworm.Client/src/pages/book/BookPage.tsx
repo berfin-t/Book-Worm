@@ -9,7 +9,7 @@ export default function BookPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        requests.Catalog.list()
+        requests.Book.list()
             .then(data => setBooks(data))
             .finally(() => setLoading(false));
 

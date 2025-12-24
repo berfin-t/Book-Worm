@@ -23,13 +23,20 @@ namespace Bookworm.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetBook(int id)
-        {            
+        public async Task<IActionResult> GetBook(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
             var book = await _context.Books.FindAsync(id);
+            
             if (book == null)
             {
                 return NotFound();
             }
+
             return Ok(book);
         }
     }

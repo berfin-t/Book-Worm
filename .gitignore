@@ -679,4 +679,10 @@ FodyWeavers.xsd
 .idea/
 *.sln.iml
 
+# SQLite database files
+*.db
+*.db-shm
+*.db-wal
+
+
 # End of https://mrkandreev.name/snippets/gitignore-generator/#react,DotnetCore,ASPNETCore,VisualStudio
