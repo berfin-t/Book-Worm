@@ -28,10 +28,6 @@ export default function Navbar() {
                     <Stack direction="row">
                         {links.map(link =>
                             <Button key={link.to} component={NavLink} to={link.to} sx={buttonStyles}>{link.title}</Button>
-
-
-
-
                         )}
                             </Stack>
                 </Box>

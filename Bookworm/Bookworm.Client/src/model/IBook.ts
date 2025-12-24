@@ -7,6 +7,6 @@ export interface IBook{
     stock: number;
     description: string;
     isActive: boolean;
-    imageUrl: string;
+    imgUrl: string;
     categoryId: number;
 }

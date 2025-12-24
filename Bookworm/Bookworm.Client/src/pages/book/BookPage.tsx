@@ -1,14 +1,23 @@
-//import { useEffect, useState } from "react";
-//import type { IBook } from "../../models/IBook"; 
-//export default function BookPage() {
-//    const [books, setBooks] = useState<Book[]>([]);
+import { useEffect, useState } from "react";
+import type { IBook } from "../../model/IBook";
+import BookList from "./BookList";
+import requests from "../../api/requests";
+import { CircularProgress } from "@mui/material";
 
-//    useEffect(() => {
-//        requests.Book.list()
-//            .then(data => setProducts(data)));
-//}, []);
+export default function BookPage() {
+    const [books, setBooks] = useState<IBook[]>([]);
+    const [loading, setLoading] = useState(true);
 
-//return (
-//    <BookList books={books} />
-//    );
-//}
+    useEffect(() => {
+        requests.Catalog.list()
+            .then(data => setBooks(data))
+            .finally(() => setLoading(false));
+
+    }, []);
+
+    if (loading) return <CircularProgress />
+
+return (
+    <BookList book={books} />
+    );
+}
