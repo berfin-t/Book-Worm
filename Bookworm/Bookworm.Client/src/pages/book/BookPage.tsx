@@ -6,11 +6,18 @@ import { CircularProgress } from "@mui/material";
 
 export default function BookPage() {
     const [books, setBooks] = useState<IBook[]>([]);
+    //const [categories, setCategories] = useState<ICategory[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        requests.Book.list()
-            .then(data => setBooks(data))
+        Promise.all([
+            requests.Book.list(),
+            requests.Category.list()
+        ])        
+            .then(([bookData]) => {
+                setBooks(bookData);
+            //    setCategories(categoryData);
+            })            
             .finally(() => setLoading(false));
 
     }, []);
@@ -19,5 +26,6 @@ export default function BookPage() {
 
 return (
     <BookList book={books} />
+        
     );
 }

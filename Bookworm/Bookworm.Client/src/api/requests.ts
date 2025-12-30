@@ -21,9 +21,14 @@ const Cart = {
     deleteItem: (bookId: number, quantity = 1) => queries.delete(`cart?bookId=${bookId}&quantity=${quantity}`)
 }
 
+const Category = {
+    list:() => queries.get("category")
+}
+
 const requests = {
     Book,
-    Cart
+    Cart,
+    Category
 }
 export default requests 
 
