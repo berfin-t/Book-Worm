@@ -1,7 +1,7 @@
 import axios, { type AxiosResponse } from "axios";
 
 axios.defaults.baseURL = "http://localhost:5141/api/";
-//axios.defaults.withCredentials = true;
+axios.defaults.withCredentials = true;
 
 const queries = {
     get: (url: string) => axios.get(url).then((response: AxiosResponse) => response.data),
@@ -16,7 +16,7 @@ const Book = {
 }
 
 const Cart = {
-    get: queries.get("cart"),
+    get: () => queries.get("cart"),
     addItem: (bookId: number, quantity = 1) => queries.post(`cart?bookId=${bookId}&quantity=${quantity}`, {}),
     deleteItem: (bookId: number, quantity = 1) => queries.delete(`cart?bookId=${bookId}&quantity=${quantity}`)
 }

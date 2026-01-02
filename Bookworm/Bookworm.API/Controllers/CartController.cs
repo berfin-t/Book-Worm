@@ -37,22 +37,23 @@ public class CartController : ControllerBase
         var result = await _context.SaveChangesAsync() > 0;
 
         if(result)
-            return CreatedAtAction(nameof(GetCarts), cart);
+            return CreatedAtAction(nameof(GetCarts), CartToDto(cart));
 
         return BadRequest(new ProblemDetails { Title = "The book can not be added to cart"});
     }
 
     [HttpDelete]
-    public async Task<ActionResult> DeleteItemFromCart(int productId, int quantity)
+    public async Task<ActionResult> DeleteItemFromCart(int bookId, int quantity)
     {
         var cart = await GetOrCreate();
 
-        cart.DeleteItem(productId, quantity);
+        cart.DeleteItem(bookId, quantity);
 
         var result = await _context.SaveChangesAsync() > 0;
 
         if(result)
-            return Ok();
+            return CreatedAtAction(nameof(GetCarts), CartToDto(cart));
+
         return BadRequest(new ProblemDetails { Title = "The book can not be removed from cart"});
     }
 
@@ -93,9 +94,9 @@ public class CartController : ControllerBase
             {
                 BookId = ci.BookId,
                 Name = ci.Book.Title,
-                Price = ci.Book.Price,
-                ImgUrl = ci.Book.ImgUrl,
-                Quantity = ci.Quantity
+                Price = ci.Book.Price,                
+                Quantity = ci.Quantity,
+                ImgUrl = ci.Book.ImgUrl
             }).ToList()
         };
     }

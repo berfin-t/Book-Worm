@@ -6,6 +6,7 @@ import { useState } from "react";
 import requests from "../../api/requests";
 import { Link } from "react-router";
 import SearchIcon from '@mui/icons-material/Search';
+import { useCartContext } from "../../context/CartContext";
 
 interface Props {
     book: IBook
@@ -14,12 +15,13 @@ interface Props {
 export default function Book({ book }: Props) {
 
     const [loading, setLoading] = useState(false);
+    const { setCart } = useCartContext();
 
     function handleAddItem(bookId: number) {
         setLoading(true);
 
         requests.Cart.addItem(bookId)
-            .then(cart => console.log(cart))
+            .then(cart => setCart(cart))
             .catch(error => console.log(error))
             .finally(() => setLoading(false));
     }
@@ -56,7 +58,8 @@ export default function Book({ book }: Props) {
                     loadingPosition="start"
                     startIcon={<AddShoppingCart />}
                     loading={loading}
-                    onClick={() => handleAddItem(book.id)}>Sepete Ekle</LoadingButton>
+                    onClick={() => handleAddItem(book.id)}
+                    color="success">Sepete Ekle</LoadingButton>
                     <Button component={Link} to={`/book/${book.id}`} variant="outlined" size="small" startIcon={<SearchIcon />}>View</Button>
             </CardActions>
         </Card>

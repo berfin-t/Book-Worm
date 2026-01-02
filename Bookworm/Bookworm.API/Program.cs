@@ -30,10 +30,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors(policy =>
-    policy.AllowAnyHeader()
+app.UseCors(opt =>
+{ 
+    opt.AllowAnyHeader()
           .AllowAnyMethod()
-          .AllowAnyOrigin());
+          .AllowCredentials()
+          .WithOrigins("http://localhost:5173");
+});
 
 app.UseStaticFiles();
 app.UseAuthorization();
