@@ -4,6 +4,7 @@ import { Outlet } from "react-router-dom";
 import { useCartContext } from "./context/CartContext";
 import { useEffect, useState } from "react";
 import requests from "./api/requests";
+import { ToastContainer } from "react-toastify";
 
 function App() {
 
@@ -21,6 +22,7 @@ function App() {
     
     return (
         <>
+            <ToastContainer position="bottom-right" hideProgressBar theme="colored"/>
             <CssBaseline />
             <Navbar />
             <Container>

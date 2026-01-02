@@ -1,4 +1,4 @@
-import { Button, Card, CardActions, CardContent, CardMedia, Typography } from "@mui/material";
+﻿import { Button, Card, CardActions, CardContent, CardMedia, Typography } from "@mui/material";
 import type { IBook } from "../../model/IBook";
 import { LoadingButton } from "@mui/lab";
 import { AddShoppingCart } from "@mui/icons-material";
@@ -7,6 +7,8 @@ import requests from "../../api/requests";
 import { Link } from "react-router";
 import SearchIcon from '@mui/icons-material/Search';
 import { useCartContext } from "../../context/CartContext";
+import { toast } from "react-toastify";
+import { currencyTRY } from "../../utils/formatCurrency";
 
 interface Props {
     book: IBook
@@ -21,7 +23,10 @@ export default function Book({ book }: Props) {
         setLoading(true);
 
         requests.Cart.addItem(bookId)
-            .then(cart => setCart(cart))
+            .then(cart => {
+                setCart(cart);
+                toast.success("Sepetinize ürün eklendi.");
+            })            
             .catch(error => console.log(error))
             .finally(() => setLoading(false));
     }
@@ -47,7 +52,7 @@ export default function Book({ book }: Props) {
                     {book.title}
                 </Typography>
                 <Typography variant="body2" color="secondary">
-                    {(book.price).toFixed(2)} TL 
+                    {currencyTRY.format(book.price)} 
                 </Typography>
             </CardContent>
 

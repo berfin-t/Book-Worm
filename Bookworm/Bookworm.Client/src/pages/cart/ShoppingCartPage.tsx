@@ -4,6 +4,9 @@ import { useCartContext } from "../../context/CartContext";
 import { useState } from "react";
 import requests from "../../api/requests";
 import { LoadingButton } from "@mui/lab";
+import { toast } from "react-toastify";
+import CartSummary from "./CartSummary";
+import { currencyTRY } from "../../utils/formatCurrency";
 
 export default function ShoppingCartPage() {
 
@@ -57,7 +60,7 @@ export default function ShoppingCartPage() {
                             <TableCell component="th" scope="row">
                                 {item.name}
                             </TableCell>
-                            <TableCell align="right">{item.price} ₺</TableCell>
+                            <TableCell align="right">{currencyTRY.format(item.price)}</TableCell>
                             <TableCell align="right">
                                 <LoadingButton
                                     loading={status.loading && status.id === "add" + item.bookId}
@@ -71,16 +74,20 @@ export default function ShoppingCartPage() {
                                     <RemoveCircleOutline />
                                 </LoadingButton>
                             </TableCell>
-                            <TableCell align="right">{item.price * item.quantity} ₺</TableCell>
+                            <TableCell align="right">{currencyTRY.format(item.price * item.quantity)}</TableCell>
                             <TableCell align="right">
                                 <LoadingButton color="error"
                                     loading={status.loading && status.id === "del_all" + item.bookId}
-                                    onClick={() => handleDeleteItem(item.bookId, "del_all" + item.bookId, item.quantity)}>
+                                    onClick={() => {
+                                        handleDeleteItem(item.bookId, "del_all" + item.bookId, item.quantity);
+                                        toast.error("Ürün sepetinizden silindi.");
+                                    }}>
                                     <Delete />
                                 </LoadingButton>
                             </TableCell>
                         </TableRow>
                     ))}
+                        <CartSummary />
                 </TableBody>
             </Table>
         </TableContainer>

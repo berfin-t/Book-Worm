@@ -1,14 +1,23 @@
-﻿import { CircularProgress, Divider, Grid, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
+﻿import { CircularProgress, Divider, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import type { IBook } from "../../model/IBook";
 import { useParams } from "react-router-dom";
 import requests from "../../api/requests";
+import { toast } from "react-toastify";
+import { useCartContext } from "../../context/CartContext";
+import { LoadingButton } from "@mui/lab";
+import { AddShoppingCart } from "@mui/icons-material";
+import { currencyTRY } from "../../utils/formatCurrency";
 
 export default function BookDetailPage() {
 
     const { id } = useParams<{ id: string }>();
     const [book, setBook] = useState<IBook | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isAdded, setIsAdded] = useState(false);
+    const { cart, setCart } = useCartContext();
+
+    const item = cart?.cartItems.find(i => i.bookId === book?.id);
 
     useEffect(() => {
         id && requests.Book.details(parseInt(id))
@@ -16,6 +25,18 @@ export default function BookDetailPage() {
             .catch(error => console.log(error))
             .finally(() => setLoading(false));
     }, [id]);
+
+    function handleAddItem(id: number) {
+        setIsAdded(true);
+
+        requests.Cart.addItem(id)
+            .then(cart => {
+                setCart(cart);
+                toast.success("Sepetinize ürün eklendi.");
+            })
+            .catch(error => console.log(error))
+            .finally(() => setIsAdded(false));
+    }
 
     if (loading) return <CircularProgress />
     if (!book) return <div>Book not found</div>
@@ -28,7 +49,7 @@ export default function BookDetailPage() {
             <Grid size={{xl:9, lg:8, md:7, sm:6, xs:12}}>
                 <Typography variant="h3">{book.title}</Typography>
                 <Divider sx={{ mb: 2 }} />
-                <Typography variant="h5" color="secondary">{book.price.toFixed(2)} TL</Typography>
+                <Typography variant="h5" color="secondary">{currencyTRY.format(book.price)}</Typography>
                 <TableContainer>
                     <Table>
                         <TableBody>
@@ -51,6 +72,23 @@ export default function BookDetailPage() {
                         </TableBody>
                     </Table>
                 </TableContainer>
+
+                <Stack direction="row" spacing={2} sx={{ mt: 3 }} alignItems="center" >
+                    <LoadingButton
+                        variant="outlined"
+                        loadingPosition="start"
+                        startIcon={<AddShoppingCart />}
+                        loading={isAdded}
+                        onClick={()=>handleAddItem(book.id) }>
+                    Sepete Ekle
+                    </LoadingButton>
+                    {
+                        item?.quantity! > 0 && (
+                            <Typography>Sepetinize {item?.quantity} ürün eklendi</Typography>
+
+                        )
+                    }
+                </Stack>
             </Grid>
         </Grid>
     );
