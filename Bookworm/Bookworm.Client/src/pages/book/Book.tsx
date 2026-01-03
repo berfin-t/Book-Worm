@@ -6,9 +6,10 @@ import { useState } from "react";
 import requests from "../../api/requests";
 import { Link } from "react-router";
 import SearchIcon from '@mui/icons-material/Search';
-import { useCartContext } from "../../context/CartContext";
 import { toast } from "react-toastify";
 import { currencyTRY } from "../../utils/formatCurrency";
+import { useAppDispatch } from "../../hooks/hooks";
+import { setCart } from "../cart/cartSlice";
 
 interface Props {
     book: IBook
@@ -17,14 +18,14 @@ interface Props {
 export default function Book({ book }: Props) {
 
     const [loading, setLoading] = useState(false);
-    const { setCart } = useCartContext();
+    const dispatch=useAppDispatch();
 
     function handleAddItem(bookId: number) {
         setLoading(true);
 
         requests.Cart.addItem(bookId)
             .then(cart => {
-                setCart(cart);
+                dispatch(setCart(cart));
                 toast.success("Sepetinize ürün eklendi.");
             })            
             .catch(error => console.log(error))

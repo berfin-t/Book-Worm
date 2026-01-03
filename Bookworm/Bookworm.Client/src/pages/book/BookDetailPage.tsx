@@ -4,10 +4,11 @@ import type { IBook } from "../../model/IBook";
 import { useParams } from "react-router-dom";
 import requests from "../../api/requests";
 import { toast } from "react-toastify";
-import { useCartContext } from "../../context/CartContext";
 import { LoadingButton } from "@mui/lab";
 import { AddShoppingCart } from "@mui/icons-material";
 import { currencyTRY } from "../../utils/formatCurrency";
+import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
+import { setCart } from "../cart/cartSlice";
 
 export default function BookDetailPage() {
 
@@ -15,7 +16,8 @@ export default function BookDetailPage() {
     const [book, setBook] = useState<IBook | null>(null);
     const [loading, setLoading] = useState(true);
     const [isAdded, setIsAdded] = useState(false);
-    const { cart, setCart } = useCartContext();
+    const { cart } = useAppSelector(state => state.cart);
+    const dispatch = useAppDispatch();
 
     const item = cart?.cartItems.find(i => i.bookId === book?.id);
 
@@ -31,7 +33,7 @@ export default function BookDetailPage() {
 
         requests.Cart.addItem(id)
             .then(cart => {
-                setCart(cart);
+                dispatch(setCart(cart));
                 toast.success("Sepetinize ürün eklendi.");
             })
             .catch(error => console.log(error))

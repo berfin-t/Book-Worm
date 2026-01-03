@@ -1,7 +1,7 @@
 import { AppBar, Badge, Box, Button, IconButton, Stack, Toolbar, Typography } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { useCartContext } from "../../context/CartContext";
+import { useAppSelector } from "../../hooks/hooks";
 
 const links = [
     { title: "Home", to: "/" },
@@ -21,7 +21,7 @@ const buttonStyles = {
 }
 export default function Navbar() {
 
-    const { cart } = useCartContext();
+    const { cart } = useAppSelector(state => state.cart);
     const itemCount = cart?.cartItems.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
 
     return (
