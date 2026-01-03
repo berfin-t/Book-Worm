@@ -3,20 +3,18 @@ import { useEffect, useState } from "react";
 import type { IBook } from "../../model/IBook";
 import { useParams } from "react-router-dom";
 import requests from "../../api/requests";
-import { toast } from "react-toastify";
 import { LoadingButton } from "@mui/lab";
 import { AddShoppingCart } from "@mui/icons-material";
 import { currencyTRY } from "../../utils/formatCurrency";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
-import { setCart } from "../cart/cartSlice";
+import { addItemToCart } from "../cart/cartSlice";
 
 export default function BookDetailPage() {
 
     const { id } = useParams<{ id: string }>();
     const [book, setBook] = useState<IBook | null>(null);
     const [loading, setLoading] = useState(true);
-    const [isAdded, setIsAdded] = useState(false);
-    const { cart } = useAppSelector(state => state.cart);
+    const { cart, status } = useAppSelector(state => state.cart);
     const dispatch = useAppDispatch();
 
     const item = cart?.cartItems.find(i => i.bookId === book?.id);
@@ -26,19 +24,7 @@ export default function BookDetailPage() {
             .then(data => setBook(data))
             .catch(error => console.log(error))
             .finally(() => setLoading(false));
-    }, [id]);
-
-    function handleAddItem(id: number) {
-        setIsAdded(true);
-
-        requests.Cart.addItem(id)
-            .then(cart => {
-                dispatch(setCart(cart));
-                toast.success("Sepetinize ürün eklendi.");
-            })
-            .catch(error => console.log(error))
-            .finally(() => setIsAdded(false));
-    }
+    }, [id]);    
 
     if (loading) return <CircularProgress />
     if (!book) return <div>Book not found</div>
@@ -80,8 +66,8 @@ export default function BookDetailPage() {
                         variant="outlined"
                         loadingPosition="start"
                         startIcon={<AddShoppingCart />}
-                        loading={isAdded}
-                        onClick={()=>handleAddItem(book.id) }>
+                        loading={status === "pendingAddItem" + book.id}
+                        onClick={()=> dispatch(addItemToCart({bookId:book.id}))}>
                     Sepete Ekle
                     </LoadingButton>
                     {

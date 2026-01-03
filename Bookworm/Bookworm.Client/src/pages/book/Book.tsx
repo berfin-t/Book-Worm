@@ -2,14 +2,11 @@
 import type { IBook } from "../../model/IBook";
 import { LoadingButton } from "@mui/lab";
 import { AddShoppingCart } from "@mui/icons-material";
-import { useState } from "react";
-import requests from "../../api/requests";
 import { Link } from "react-router";
 import SearchIcon from '@mui/icons-material/Search';
-import { toast } from "react-toastify";
 import { currencyTRY } from "../../utils/formatCurrency";
-import { useAppDispatch } from "../../hooks/hooks";
-import { setCart } from "../cart/cartSlice";
+import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
+import { addItemToCart } from "../cart/cartSlice";
 
 interface Props {
     book: IBook
@@ -17,20 +14,8 @@ interface Props {
 
 export default function Book({ book }: Props) {
 
-    const [loading, setLoading] = useState(false);
-    const dispatch=useAppDispatch();
-
-    function handleAddItem(bookId: number) {
-        setLoading(true);
-
-        requests.Cart.addItem(bookId)
-            .then(cart => {
-                dispatch(setCart(cart));
-                toast.success("Sepetinize ürün eklendi.");
-            })            
-            .catch(error => console.log(error))
-            .finally(() => setLoading(false));
-    }
+    const {status} = useAppSelector(state=> state.cart);
+    const dispatch=useAppDispatch();    
 
     return (
         <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -63,8 +48,8 @@ export default function Book({ book }: Props) {
                     variant="outlined"
                     loadingPosition="start"
                     startIcon={<AddShoppingCart />}
-                    loading={loading}
-                    onClick={() => handleAddItem(book.id)}
+                    loading={status === "pendingAddItem" + book.id}
+                    onClick={() => dispatch(addItemToCart({bookId:book.id}))}
                     color="success">Sepete Ekle</LoadingButton>
                     <Button component={Link} to={`/book/${book.id}`} variant="outlined" size="small" startIcon={<SearchIcon />}>View</Button>
             </CardActions>
