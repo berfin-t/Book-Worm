@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import requests from "./api/requests";
 import { ToastContainer } from "react-toastify";
 import { useAppDispatch } from "./hooks/hooks";
-import { setCart } from "./pages/cart/cartSlice";
+import { setCart } from "./features/cart/cartSlice";
 
 function App() {
 

@@ -1,32 +1,28 @@
 ﻿import { CircularProgress, Divider, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
-import type { IBook } from "../../model/IBook";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import requests from "../../api/requests";
 import { LoadingButton } from "@mui/lab";
 import { AddShoppingCart } from "@mui/icons-material";
 import { currencyTRY } from "../../utils/formatCurrency";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { addItemToCart } from "../cart/cartSlice";
+import { fetchBookById, selectBookById } from "./bookSlice";
 
 export default function BookDetailPage() {
 
     const { id } = useParams<{ id: string }>();
-    const [book, setBook] = useState<IBook | null>(null);
-    const [loading, setLoading] = useState(true);
+    const book = useAppSelector(state => selectBookById(state, Number(id)));
+    const { status: loading } = useAppSelector(state => state.book);
     const { cart, status } = useAppSelector(state => state.cart);
     const dispatch = useAppDispatch();
 
     const item = cart?.cartItems.find(i => i.bookId === book?.id);
 
     useEffect(() => {
-        id && requests.Book.details(parseInt(id))
-            .then(data => setBook(data))
-            .catch(error => console.log(error))
-            .finally(() => setLoading(false));
+        if(!book && id) dispatch(fetchBookById(parseInt(id)))
     }, [id]);    
 
-    if (loading) return <CircularProgress />
+    if (loading === "pendingFetchBookById") return <CircularProgress />
     if (!book) return <div>Book not found</div>
 
     return (
