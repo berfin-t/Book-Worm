@@ -1,4 +1,6 @@
 using Bookworm.API.Data;
+using Bookworm.API.Entity;
+using BookWorm.API.Entity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +14,7 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlite(connectionString);
 });
 builder.Services.AddCors();
+builder.Services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<DataContext>();
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -42,5 +45,7 @@ app.UseStaticFiles();
 app.UseAuthorization();
 
 app.MapControllers();
+
+SeedDatabase.Initialize(app);
 
 app.Run();
