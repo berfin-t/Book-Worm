@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace BookWorm.API.Entity
+namespace Bookworm.API.Entity;
+
+public class AppUser: IdentityUser
 {
-	public class AppUser: IdentityUser
-	{
-		public string? Name { get; set; }
-    }
+	public string? Name { get; set; }
 }

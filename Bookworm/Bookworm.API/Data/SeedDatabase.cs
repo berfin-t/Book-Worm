@@ -1,5 +1,4 @@
 using Bookworm.API.Entity;
-using BookWorm.API.Entity;
 using Microsoft.AspNetCore.Identity;
 
 namespace Bookworm.API.Data
