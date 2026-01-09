@@ -1,49 +1,90 @@
-import { AppBar, Badge, Box, Button, IconButton, Stack, Toolbar, Typography } from "@mui/material";
+import { AppBar,Badge,Box,Button,IconButton,Stack,Toolbar,Typography} from "@mui/material";
 import { NavLink } from "react-router-dom";
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useAppSelector } from "../../hooks/hooks";
 
 const links = [
     { title: "Home", to: "/" },
     { title: "Books", to: "/books" },
     { title: "Authors", to: "/authors" },
-]
+];
+
+const authedLinks = [
+    { title: "Register", to: "/register" },
+    { title: "Login", to: "/login" },
+];
 
 const buttonStyles = {
-    color: "inherit",
+    color: "#FFF7ED", 
     textDecoration: "none",
+    fontWeight: 500,
     "&:hover": {
-        color: "text.primary"
+        color: "#FEF3C7", 
+        backgroundColor: "rgba(0,0,0,0.05)",
     },
     "&.active": {
-        color: "warning.main"
-    }
-}
-export default function Navbar() {
+        color: "#78350F", 
+        fontWeight: "bold",
+    },
+};
 
-    const { cart } = useAppSelector(state => state.cart);
-    const itemCount = cart?.cartItems.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
+export default function Navbar() {
+    const { cart } = useAppSelector((state) => state.cart);
+    const itemCount =
+        cart?.cartItems.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
 
     return (
-        <AppBar position="static" sx={{ width: "100%", backgroundColor: "#47008F" }}>
+        <AppBar
+            position="static"
+            sx={{
+                width: "100%",
+                backgroundColor: "#F59E0B" 
+            }}
+        >
             <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <Typography variant="h6">Book Worm</Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                    <Typography
+                        variant="h6"
+                        sx={{ fontWeight: "bold", color: "#FFF7ED" }}
+                    >
+                        Bookworm
+                    </Typography>
 
                     <Stack direction="row">
-                        {links.map(link =>
-                            <Button key={link.to} component={NavLink} to={link.to} sx={buttonStyles}>{link.title}</Button>
-                        )}
-                            </Stack>
+                        {links.map((link) => (
+                            <Button
+                                key={link.to}
+                                component={NavLink}
+                                to={link.to}
+                                sx={buttonStyles}
+                            >
+                                {link.title}
+                            </Button>
+                        ))}
+                    </Stack>
                 </Box>
 
-                <Box sx={{ display: "flex", alignItems: "center" }}> 
-                    <IconButton component={NavLink} to="/cart"
-                        size="large" edge="start" color="inherit">
-                        <Badge badgeContent={itemCount} color="secondary">
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <IconButton component={NavLink} to="/cart" color="inherit">
+                        <Badge
+                            badgeContent={itemCount}
+                            sx={{
+                                "& .MuiBadge-badge": {
+                                    backgroundColor: "#78350F", 
+                                    color: "#FFF7ED",
+                                },
+                            }}
+                        >
                             <ShoppingCartIcon />
                         </Badge>
                     </IconButton>
+
+                    <Stack direction="row">
+                        {authedLinks.map(link =>
+                            <Button key={link.to} component={NavLink} to={link.to} sx={buttonStyles}>{link.title}</Button>
+                        )}
+                    </Stack>
+
                 </Box>
             </Toolbar>
         </AppBar>
