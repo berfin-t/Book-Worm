@@ -24,19 +24,29 @@ export const addItemToCart = createAsyncThunk<ICart, {bookId:number, quantity?:n
     }
 );
 
-export const deleteItemFromCart = createAsyncThunk<ICart, {
-    key: string;bookId:number,quantity?:number
-}>(
+export const deleteItemFromCart = createAsyncThunk<ICart, { bookId: number, quantity?: number, key?: string }>(
     "cart/deleteItemFromCart",
-    async({bookId,quantity=1}) => {
+    async ({ bookId, quantity = 1 }) => {
         try {
-            return await requests.Cart.deleteItem(bookId,quantity);
+            return await requests.Cart.deleteItem(bookId, quantity);
         }
-        catch(error) {
+        catch (error) {
             console.log(error);
         }
     }
 );
+
+export const getCart = createAsyncThunk<ICart>(
+    "cart/getcart",
+    async (_, thunkAPI) => {
+        try {
+            return await requests.Cart.get();
+        }
+        catch (error: any) {
+            return thunkAPI.rejectWithValue({ error: error.data });
+        }
+    }
+)
 
 export const cartSlice = createSlice({
     name:"cart",

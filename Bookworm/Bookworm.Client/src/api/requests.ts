@@ -1,7 +1,15 @@
 import axios, { type AxiosResponse } from "axios";
+import { store } from "../store/store";
 
 axios.defaults.baseURL = "http://localhost:5141/api/";
 axios.defaults.withCredentials = true;
+
+axios.interceptors.request.use(requests => {
+    const token = store.getState().account.user?.token;
+    if (token)
+        requests.headers.Authorization = `Bearer ${token}`;
+    return requests;
+})
 
 const queries = {
     get: (url: string) => axios.get(url).then((response: AxiosResponse) => response.data),
@@ -25,10 +33,17 @@ const Category = {
     list:() => queries.get("category")
 }
 
+const Account = {
+    login: (values: any) => queries.post("account/login", values),
+    register: (values: any) => queries.post("account/register", values),
+    getUser: () => queries.get("account/getUser")
+}
+
 const requests = {
     Book,
     Cart,
-    Category
+    Category,
+    Account
 }
 export default requests 
 

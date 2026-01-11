@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Bookworm.API.Dtos;
 using Bookworm.API.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Bookworm.API.Controllers;
 
@@ -10,34 +11,37 @@ namespace Bookworm.API.Controllers;
 [Route("api/[controller]")]
 public class AccountController : ControllerBase
 {
-    public readonly UserManager<AppUser> _userMaanager;
+    public readonly UserManager<AppUser> _userManager;
     public readonly TokenService _tokenService;
 
     public AccountController(UserManager<AppUser> userManager, TokenService tokenService)
     {
-        _userMaanager = userManager;
+        _userManager = userManager;
         _tokenService = tokenService;
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto loginDto)
     {
-        var user = await _userMaanager.FindByNameAsync(loginDto.Username);
+        var user = await _userManager.FindByNameAsync(loginDto.Username);
 
         if (user == null)
         {
             return BadRequest("Invalid username or password");
         }
 
-        var result = await _userMaanager.CheckPasswordAsync(user, loginDto.Password);
+        var result = await _userManager.CheckPasswordAsync(user, loginDto.Password);
 
-        if (!result)
+        if (result)
         {
-            return BadRequest("Invalid username or password");
+            return Ok(new UserDto
+            {
+                Name = user.Name!,
+                Token = await _tokenService.GenerateTokenAsync(user)
+            });
         }
 
-        return Ok(new{ token = await _tokenService.GenerateTokenAsync(user) });
-
+        return Unauthorized();
     }
 
     [HttpPost("register")]
@@ -55,7 +59,7 @@ public class AccountController : ControllerBase
             Email = registerDto.Email
         };
 
-        var result = await _userMaanager.CreateAsync(user, registerDto.Password);
+        var result = await _userManager.CreateAsync(user, registerDto.Password);
 
         if (!result.Succeeded)
         {
@@ -63,5 +67,24 @@ public class AccountController : ControllerBase
         }
 
         return Ok(result);
+    }
+
+    [Authorize]
+    [HttpGet("getUser")]
+    public async Task<ActionResult<UserDto>> GetUser()
+    {
+        var user = await _userManager.FindByNameAsync(User.Identity?.Name!);
+
+        if(user == null)
+        {
+            return BadRequest(new ProblemDetails { Title = "Username ya da password hataý!"});
+        }
+
+        return new UserDto
+        {
+            Name = user.Name!,
+            Token = await _tokenService.GenerateTokenAsync(user)
+        };
+
     }
 }

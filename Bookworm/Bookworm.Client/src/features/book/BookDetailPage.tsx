@@ -4,9 +4,9 @@ import { useParams } from "react-router-dom";
 import { LoadingButton } from "@mui/lab";
 import { AddShoppingCart } from "@mui/icons-material";
 import { currencyTRY } from "../../utils/formatCurrency";
-import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { addItemToCart } from "../cart/cartSlice";
 import { fetchBookById, selectBookById } from "./bookSlice";
+import { useAppSelector, useAppDispatch } from "../../store/store";
 
 export default function BookDetailPage() {
 

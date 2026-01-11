@@ -1,11 +1,28 @@
-﻿import { useState } from "react";
-import { motion } from "framer-motion";
-import { Box, Button, Card, CardContent, TextField, Typography} from "@mui/material";
+﻿import { motion } from "framer-motion";
+import { Box, Card, CardContent, TextField, Typography} from "@mui/material";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
+import { useForm, type FieldValues } from "react-hook-form";
+import { LoadingButton } from "@mui/lab";
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "./accountSlice";
+import { useAppDispatch } from "../../store/store";
 
 export default function LoginPage() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");    
+
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+
+    const { register, handleSubmit, formState: {  isSubmitting } } = useForm({
+        defaultValues: {
+            username: '',
+            password: ''
+        }
+    });
+
+    async function submitForm(data: FieldValues) {
+        await dispatch(loginUser(data));
+        navigate("/books");
+    }
 
     return (
 
@@ -45,21 +62,28 @@ export default function LoginPage() {
 
                         </Box>
 
-                        <Box component="form" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                        <Box component="form" onSubmit={handleSubmit(submitForm)}
+                            sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
 
-                        <TextField label="E-posta"
-                            type="email"
+                            <TextField
+                                {...register("username")}
+                                label="User Name"
+                            type="username"
                             required
                             fullWidth>
                         </TextField>
 
-                        <TextField label="Password"
+                            <TextField
+                                {...register("password")}
+                                label="Password"
                             type="password"
                             required
                             fullWidth>
                         </TextField>
 
-                        <Button type="submit"
+                            <LoadingButton 
+                                loading={isSubmitting}
+                                type="submit"
                                 variant="contained"
                                 fullWidth
                                 sx={{
@@ -71,7 +95,7 @@ export default function LoginPage() {
                                     },
                                 }}>Gİrİş Yap
 
-                            </Button>
+                            </LoadingButton>
 
                         </Box>
 

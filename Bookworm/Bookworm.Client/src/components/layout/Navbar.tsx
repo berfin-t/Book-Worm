@@ -1,7 +1,8 @@
 import { AppBar,Badge,Box,Button,IconButton,Stack,Toolbar,Typography} from "@mui/material";
 import { NavLink } from "react-router-dom";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import { useAppSelector } from "../../hooks/hooks";
+import { logout } from "../../features/account/accountSlice";
+import { useAppSelector, useAppDispatch } from "../../store/store";
 
 const links = [
     { title: "Home", to: "/" },
@@ -29,7 +30,10 @@ const buttonStyles = {
 };
 
 export default function Navbar() {
-    const { cart } = useAppSelector((state) => state.cart);
+    const { cart } = useAppSelector(state => state.cart);
+    const { user } = useAppSelector(state => state.account);
+    const dispatch = useAppDispatch();
+
     const itemCount =
         cart?.cartItems.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
 
@@ -79,11 +83,20 @@ export default function Navbar() {
                         </Badge>
                     </IconButton>
 
-                    <Stack direction="row">
-                        {authedLinks.map(link =>
-                            <Button key={link.to} component={NavLink} to={link.to} sx={buttonStyles}>{link.title}</Button>
-                        )}
-                    </Stack>
+                    {
+                        user ? (
+                            <Stack direction="row">
+                                <Button sx={buttonStyles}>{user.name}</Button>
+                                <Button sx={buttonStyles} onClick={() => dispatch(logout())}>Log Out</Button>
+                            </Stack>
+                        ) : (
+                                <Stack direction="row">
+                                    {authedLinks.map(link =>
+                                        <Button key={link.to} component={NavLink} to={link.to} sx={buttonStyles}>{link.title}</Button>
+                                    )}
+                                </Stack>
+                        )
+                    }
 
                 </Box>
             </Toolbar>

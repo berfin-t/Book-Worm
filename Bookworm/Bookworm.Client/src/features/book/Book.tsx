@@ -5,8 +5,8 @@ import { AddShoppingCart } from "@mui/icons-material";
 import { Link } from "react-router";
 import SearchIcon from '@mui/icons-material/Search';
 import { currencyTRY } from "../../utils/formatCurrency";
-import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { addItemToCart } from "../cart/cartSlice";
+import { useAppSelector, useAppDispatch } from "../../store/store";
 
 interface Props {
     book: IBook
