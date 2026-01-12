@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Bookworm.API.Dtos;
 using Bookworm.API.Services;
 using Microsoft.AspNetCore.Authorization;
+using Bookworm.API.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bookworm.API.Controllers;
 
@@ -13,12 +15,14 @@ public class AccountController : ControllerBase
 {
     public readonly UserManager<AppUser> _userManager;
     public readonly TokenService _tokenService;
+    public readonly DataContext _context;
 
-    public AccountController(UserManager<AppUser> userManager, TokenService tokenService)
+    public AccountController(UserManager<AppUser> userManager, TokenService tokenService, DataContext context)
     {
         _userManager = userManager;
         _tokenService = tokenService;
-    }
+        _context = context;
+    }    
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto loginDto)
@@ -34,7 +38,21 @@ public class AccountController : ControllerBase
 
         if (result)
         {
-            return Ok(new UserDto
+            var userCart = await GetOrCreate(loginDto.Username);
+            var cookiesCart = await GetOrCreate(Request.Cookies["customerId"]!);
+
+            if (userCart != null) {
+                foreach (var item in userCart.CartItems)
+                {
+                    cookiesCart.AddItem(item.Book, item.Quantity);
+                }
+                _context.Carts.Remove(userCart);
+            }
+
+            cookiesCart.CustomerId = loginDto.Username;
+            await _context.SaveChangesAsync();
+
+                return Ok(new UserDto
             {
                 Name = user.Name!,
                 Token = await _tokenService.GenerateTokenAsync(user)
@@ -42,6 +60,39 @@ public class AccountController : ControllerBase
         }
 
         return Unauthorized();
+    }
+
+    private async Task<Cart> GetOrCreate(string custId)
+    {
+        var cart = await _context.Carts
+                    .Include(i => i.CartItems)
+                    .ThenInclude(i => i.Book)
+                    .Where(i => i.CustomerId == custId)
+                    .FirstOrDefaultAsync();
+
+        if (cart == null)
+        {
+            var customerId = User.Identity?.Name;
+
+            if (string.IsNullOrEmpty(customerId))
+            {
+                customerId = Guid.NewGuid().ToString();
+                var cookieOptions = new CookieOptions
+                {
+                    Expires = DateTime.Now.AddMonths(1),
+                    IsEssential = true
+                };
+
+                Response.Cookies.Append("customerId", customerId, cookieOptions);
+            }
+
+            cart = new Cart { CustomerId = customerId };
+
+            _context.Carts.Add(cart);
+            await _context.SaveChangesAsync();
+        }
+
+        return cart;
     }
 
     [HttpPost("register")]
@@ -66,7 +117,8 @@ public class AccountController : ControllerBase
             return BadRequest(result.Errors);
         }
 
-        return Ok(result);
+        await _userManager.AddToRoleAsync(user, "Customer");
+        return Ok(new { message = "User registered successfully" });
     }
 
     [Authorize]
@@ -77,7 +129,7 @@ public class AccountController : ControllerBase
 
         if(user == null)
         {
-            return BadRequest(new ProblemDetails { Title = "Username ya da password hataý!"});
+            return BadRequest(new ProblemDetails { Title = "Username ya da password hataï¿½!"});
         }
 
         return new UserDto

@@ -14,18 +14,23 @@ public class CartController : ControllerBase
     public CartController(DataContext context)
     {
         _context = context;
-    }   
+    }
+
+    private string GetCustomerId()
+    {
+        return User.Identity?.Name ?? Request.Cookies["customerId"]!;
+    }
 
     [HttpGet]
     public async Task<ActionResult<CartDto>> GetCarts()
     {
-        return CartToDto(await GetOrCreate());
+        return CartToDto(await GetOrCreate(GetCustomerId()));
     }
 
     [HttpPost]
     public async Task<ActionResult> AddItemToCart(int bookId, int quantity)
     {
-        var cart = await GetOrCreate();
+        var cart = await GetOrCreate(GetCustomerId());
 
         var book = await _context.Books.FirstOrDefaultAsync(b => b.Id == bookId);
 
@@ -45,7 +50,7 @@ public class CartController : ControllerBase
     [HttpDelete]
     public async Task<ActionResult> DeleteItemFromCart(int bookId, int quantity)
     {
-        var cart = await GetOrCreate();
+        var cart = await GetOrCreate(GetCustomerId());
 
         cart.DeleteItem(bookId, quantity);
 
@@ -57,7 +62,7 @@ public class CartController : ControllerBase
         return BadRequest(new ProblemDetails { Title = "The book can not be removed from cart"});
     }
 
-    private async Task<Cart> GetOrCreate()
+    private async Task<Cart> GetOrCreate(string custId)
     {
         var cart = await _context.Carts
             .Include(c => c.CartItems)
