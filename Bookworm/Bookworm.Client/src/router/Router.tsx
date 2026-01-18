@@ -6,12 +6,17 @@ import BookDetailPage from "../features/book/BookDetailPage";
 import ShoppingCartPage from "../features/cart/ShoppingCartPage";
 import LoginPage from "../features/account/LoginPage";
 import RegisterPage from "../features/account/RegisterPage";
+import CheckoutPage from "../features/checkout/CheckoutPage";
+import AuthGuard from "./AuthGuard";
 
 export const router = createBrowserRouter([
     {
         path: "/",
         element: <App />,
         children: [
+            { element: <AuthGuard />, children: [
+                    {path: "/checkout", element: <CheckoutPage/>}
+            ] },
             { path: "/", element: <HomePage /> },
             { path: "/books", element: <BookPage /> },
             { path: "/book/:id", element: <BookDetailPage /> },
