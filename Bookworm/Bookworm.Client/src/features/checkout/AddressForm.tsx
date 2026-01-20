@@ -5,7 +5,7 @@ export default function () {
     const { register, formState: { errors } } = useFormContext();
 
     return (        
-        <Grid>
+        <Grid container spacing={3}>
             <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
                     {...register("firstname", { required: "firstname is required" })}
@@ -46,7 +46,7 @@ export default function () {
                     error={!!errors.city}></TextField>
             </Grid>
 
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid size={{ xs: 12 }}>
                 <TextField
                     {...register("addressline", { required: "addressline is required" })}
                     label="Enter addressline"

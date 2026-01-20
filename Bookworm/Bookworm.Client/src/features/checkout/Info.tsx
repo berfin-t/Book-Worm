@@ -15,7 +15,7 @@ export default function Info() {
             <Typography variant="h5" gutterBottom>{currencyTRY.format(total)}</Typography> 
             <List>
                 {cart?.cartItems.map((item) => (
-                    <ListItem >
+                    <ListItem key={item.bookId}>
                         <ListItemAvatar>
                             <Avatar variant="square" src={`http://localhost:5141/images/${item.imgUrl}`}></Avatar>
                         </ListItemAvatar>

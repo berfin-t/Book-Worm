@@ -6,6 +6,10 @@ import { useForm, type FieldValues, FormProvider } from "react-hook-form";
 import AddressForm from "./AddressForm";
 import PaymentForm from "./PaymentForm";
 import Review from "./Review";
+import { useAppDispatch } from "../../store/store";
+import requests from "../../api/requests";
+import { clearCart } from "../cart/cartSlice";
+import { LoadingButton } from "@mui/lab";
 
 const steps = ["Teslimat Bilgileri", "Ödeme", "Sipariş Özeti"];
 
@@ -22,13 +26,31 @@ function getStepContent(step: number) {
     }
 }
 export default function CheckoutPage() {
+
     const [activeStep, setActiveStep] = useState(0);
     const methods = useForm();
+    const [orderId, setOrderId] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const dispatch = useAppDispatch();
 
-    function handleNext(data: FieldValues) {
-        console.log(data);
-        setActiveStep(activeStep + 1);
+    async function handleNext(data: FieldValues) {
+        if(activeStep === 2) {
+            setLoading(true);
+            try {
+                setOrderId(await requests.Order.create(data));
+                setActiveStep(activeStep + 1);
+                dispatch(clearCart());
+                setLoading(false);
+            }
+            catch(error:any) {
+                console.log(error);
+                setLoading(false);
+            }
+        } else {
+            setActiveStep(activeStep + 1);
+        }
     }
+
     function handlePrevious() {
         setActiveStep(activeStep - 1);
     }
@@ -40,9 +62,10 @@ export default function CheckoutPage() {
                     <Grid size={4 }>
                     <Info />
                     </Grid>
-                    <Grid size={8 }>
+                    <Grid size={activeStep !== steps.length ? 8: 12 } sx={{p:3}}>
                         <Box>
-                            <Stepper activeStep={activeStep} sx={{height:40} }>
+                            <Stepper activeStep={activeStep} 
+                            sx={{height:40} }>
                                 {steps.map((label) => (
                                     <Step key={label}>
                                         <StepLabel>{label}</StepLabel>
@@ -56,11 +79,16 @@ export default function CheckoutPage() {
                                     <Typography variant="h1">📦</Typography>
                                     <Typography variant="h5">Teşekkür ederiz. Siparişinizi aldık</Typography>
                                     <Typography variant="body1" sx={{color: "text.secondary"}}>
-                                        Sipariş numaranız <strong>#1234</strong>. Siparişiniz onaylandığında size bir eposta göndereceğiz.
+                                        Sipariş numaranız <strong>#{orderId}</strong>. Siparişiniz onaylandığında size bir eposta göndereceğiz.
                                     </Typography>
                                     <Button 
                                     sx={{alignSelf: "start", 
-                                        width: {xs: "100%", sm: "auto"}}}                                    
+                                        width: {xs: "100%", sm: "auto"},
+                                    backgroundColor: "#F59E0B",
+                                                        fontWeight: "bold",
+                                                        "&:hover": {
+                                                        backgroundColor: "#D97706"
+                                                            }}}                                    
                                     variant="contained">Siparişleri Listele</Button>
                                 </Stack>                                 
                             ) : (                                
@@ -82,9 +110,28 @@ export default function CheckoutPage() {
                                                 {
                                                     activeStep !== 0 &&
                                                     <Button startIcon={<ChevronLeftRounded />} variant="contained"
-                                                        onClick={handlePrevious}>Geri</Button>
+                                                        onClick={handlePrevious}
+                                                        sx={{
+                                                        backgroundColor: "#F59E0B",
+                                                        fontWeight: "bold",
+                                                        "&:hover": {
+                                                        backgroundColor: "#D97706"
+                                                            },  
+                                                        }}>Geri</Button>
                                                 }
-                                                <Button type="submit" startIcon={<ChevronRightRounded />} variant="contained">İleri</Button>
+                                                <LoadingButton
+                                                type="submit" 
+                                                loading={loading}
+                                                sx={{
+                                                    backgroundColor: "#F59E0B",
+                                                        fontWeight: "bold",
+                                                        "&:hover": {
+                                                        backgroundColor: "#D97706"
+                                                            }, 
+                                                }}
+                                                startIcon={<ChevronRightRounded />} variant="contained">
+                                                    {activeStep === 2 ? "Siparişi Tamamla":"Devam"}
+                                            </LoadingButton>
                                             </Box>
                                         </Box>
                                     </form>                               

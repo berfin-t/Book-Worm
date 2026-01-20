@@ -39,11 +39,18 @@ const Account = {
     getUser: () => queries.get("account/getUser")
 }
 
+const Order = {
+    list: () => queries.get("order"),
+    get: (id:number) => queries.get(`order/${id}`),
+    create:(formData:any) => queries.post("order", formData)
+}
+
 const requests = {
     Book,
     Cart,
     Category,
-    Account
+    Account,
+    Order
 }
 export default requests 
 

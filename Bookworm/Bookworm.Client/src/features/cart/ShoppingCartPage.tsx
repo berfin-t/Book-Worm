@@ -71,7 +71,14 @@ export default function ShoppingCartPage() {
         </TableContainer>
             </Container>
             <Box display="flex" justifyContent="flex-end" sx={{mt:3} }>
-                <Button component={Link} to="/checkout" variant="contained" color="primary" >Checkout</Button>
+                <Button component={Link} to="/checkout" variant="contained" 
+                sx={{
+                    backgroundColor: "#F59E0B",
+                                fontWeight: "bold",
+                                "&:hover": {
+                                        backgroundColor: "#D97706"
+                                    },
+                }} >Checkout</Button>
         </Box>
         </>
     );

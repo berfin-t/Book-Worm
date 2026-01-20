@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form";
 export default function PaymentForm() {
     const {formState:{errors}, register} = useFormContext();
     return(
-        <Grid>
+        <Grid container spacing={3}>
             <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
                     {...register("card _name", { required: "Card name is required" })}
