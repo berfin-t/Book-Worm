@@ -1,8 +1,11 @@
-import { AppBar,Badge,Box,Button,IconButton,Stack,Toolbar,Typography} from "@mui/material";
+import { AppBar,Badge,Box,Button,Container,IconButton,MenuItem,Stack,Toolbar,Menu} from "@mui/material";
 import { NavLink } from "react-router-dom";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { logout } from "../../features/account/accountSlice";
 import { useAppSelector, useAppDispatch } from "../../store/store";
+import { clearCart } from "../../features/cart/cartSlice";
+import { useState } from "react";
+import { KeyboardArrowDown } from "@mui/icons-material";
 
 const links = [
     { title: "Home", to: "/" },
@@ -33,9 +36,19 @@ export default function Navbar() {
     const { cart } = useAppSelector(state => state.cart);
     const { user } = useAppSelector(state => state.account);
     const dispatch = useAppDispatch();
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
 
     const itemCount =
         cart?.cartItems.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
+
+    function handleClick(event: React.MouseEvent<HTMLElement>) {
+        setAnchorEl(event.currentTarget);
+    }
+
+    function handleClose() {
+        setAnchorEl(null);
+    }
 
     return (
         <AppBar
@@ -45,14 +58,15 @@ export default function Navbar() {
                 backgroundColor: "#F59E0B" 
             }}
         >
+            <Container maxWidth="lg">
             <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Typography
+                    {/* <Typography
                         variant="h6"
                         sx={{ fontWeight: "bold", color: "#FFF7ED" }}
                     >
                         Bookworm
-                    </Typography>
+                    </Typography> */}
 
                     <Stack direction="row">
                         {links.map((link) => (
@@ -85,10 +99,25 @@ export default function Navbar() {
 
                     {
                         user ? (
-                            <Stack direction="row">
-                                <Button sx={buttonStyles}>{user.name}</Button>
-                                <Button sx={buttonStyles} onClick={() => dispatch(logout())}>Log Out</Button>
-                            </Stack>
+                            <>
+                                <Button id="user-button" onClick={handleClick} endIcon={<KeyboardArrowDown />} sx={buttonStyles}>{user.name}</Button>
+
+                                <Menu id="user-menu" anchorEl={anchorEl} open={open} onClose={handleClose}>
+                                    <MenuItem component={NavLink} to="/orders" onClick={handleClose}>
+                                        Orders
+                                    </MenuItem>
+                                    <MenuItem
+                                        onClick={() => {
+                                            handleClose();
+                                            dispatch(logout());
+                                            dispatch(clearCart());
+                                        }}
+                                    >
+                                        Logout
+                                    </MenuItem>
+                                </Menu>
+                                        
+                            </>
                         ) : (
                                 <Stack direction="row">
                                     {authedLinks.map(link =>
@@ -100,6 +129,7 @@ export default function Navbar() {
 
                 </Box>
             </Toolbar>
+            </Container>
         </AppBar>
     );
 }
