@@ -1,4 +1,4 @@
-import { AppBar,Badge,Box,Button,Container,IconButton,MenuItem,Stack,Toolbar,Menu} from "@mui/material";
+import { AppBar,Badge,Box,Button,Container,IconButton,MenuItem,Stack,Toolbar,Menu, Typography} from "@mui/material";
 import { NavLink } from "react-router-dom";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { logout } from "../../features/account/accountSlice";
@@ -8,7 +8,7 @@ import { useState } from "react";
 import { KeyboardArrowDown } from "@mui/icons-material";
 
 const links = [
-    { title: "Home", to: "/" },
+    { title: "Home", to: "/"},
     { title: "Books", to: "/books" },
     { title: "Authors", to: "/authors" },
 ];
@@ -61,12 +61,12 @@ export default function Navbar() {
             <Container maxWidth="lg">
             <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    {/* <Typography
+                    <Typography
                         variant="h6"
                         sx={{ fontWeight: "bold", color: "#FFF7ED" }}
                     >
                         Bookworm
-                    </Typography> */}
+                    </Typography>
 
                     <Stack direction="row">
                         {links.map((link) => (
