@@ -16,8 +16,9 @@ builder.Services.AddDbContext<DataContext>(options =>
     var config = builder.Configuration;
     var connectionString = config.GetConnectionString("defaultConnection");
 
-    options.UseSqlite(connectionString);
+    options.UseNpgsql(connectionString);
 });
+
 builder.Services.AddCors();
 builder.Services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<DataContext>();
 

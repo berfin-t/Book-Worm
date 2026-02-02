@@ -21,7 +21,7 @@ export default function RecentlyAdded({books}: Props) {
 
     const visibleCount = 5;
     const next=()=>{
-        if(index < books.length - visibleCount) {
+        if(index < books.length ) {
             setIndex(index + 1);
         }
     };
@@ -37,7 +37,7 @@ export default function RecentlyAdded({books}: Props) {
         {/* Header */}
         <Box sx={{p:3, mt:2, maxWidth:1300, mx:"auto", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
             <Typography variant="h6" fontWeight="bold">Son Eklenenler</Typography>
-            <Link href="/books" underline="hover" sx={{cursor:"pointer"}}
+            <Link href="/books" underline="hover" sx={{cursor:"pointer"}} color="#F59E0B"
             >Tümünü Göster</Link>
         </Box>
 
