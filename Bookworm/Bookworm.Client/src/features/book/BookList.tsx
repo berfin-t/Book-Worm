@@ -10,7 +10,7 @@ export default function BookList({ book }: Props) {
     if (!book || book.length === 0) return null;    
 
     return (
-        <Grid container spacing={2} sx={{pt:4} }>
+        <Grid container spacing={2} sx={{pt:4, mb:5} }>
             {book.map((b) => (
                 <Grid key={b.id} size={{ xs: 6, md: 8, lg:3 }}>
                     <Book book={b} />

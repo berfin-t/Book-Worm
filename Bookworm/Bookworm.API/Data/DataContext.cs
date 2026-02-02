@@ -83,6 +83,57 @@ namespace Bookworm.API.Data
                     IsActive = true,
                     ImgUrl = "4.jpg",
                     CategoryId = 2
+                },
+                new Book
+                {
+                    Id = 5,
+                    Title = "To Kill a Mockingbird",
+                    Author = "Harper Lee",
+                    Isbn = "9780061120084",
+                    Price = 110.99m,
+                    Stock = 90,
+                    Description = "A novel about racial injustice in the Deep South.",
+                    IsActive = true,
+                    ImgUrl = "5.jpg",
+                    CategoryId = 1
+                },
+                new Book
+                {
+                    Id = 6,
+                    Title = "Educated",
+                    Author = "Tara Westover",
+                    Isbn = "9780399590504",
+                    Price = 130.99m,
+                    Stock = 60,
+                    Description = "A memoir about a young woman's journey from an isolated upbringing to a college education.",
+                    IsActive = true,
+                    ImgUrl = "6.jpg",
+                    CategoryId = 3
+                },
+                new Book
+                {
+                    Id = 7,
+                    Title = "Brave New World",  
+                    Author = "Aldous Huxley",
+                    Isbn = "9780060850524",
+                    Price = 120.99m,
+                    Stock = 80,
+                    Description = "A dystopian novel about a future society.",
+                    IsActive = true,
+                    ImgUrl = "7.jpg",
+                    CategoryId = 2
+                }, new Book
+                {
+                    Id = 8,
+                    Title = "The Catcher in the Rye",
+                    Author = "J.D. Salinger",
+                    Isbn = "9780316769488",
+                    Price = 105.99m,
+                    Stock = 110,
+                    Description = "A novel about a teenager's journey through adolescence.",
+                    IsActive = true,
+                    ImgUrl = "8.jpg",
+                    CategoryId = 1
                 }
             );
         }

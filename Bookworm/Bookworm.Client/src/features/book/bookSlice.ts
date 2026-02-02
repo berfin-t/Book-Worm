@@ -35,9 +35,11 @@ export const bookSlice = createSlice({
         builder.addCase(fetchBooks.fulfilled, (state, action) => {
             booksAdapter.setAll(state, action.payload);
             state.status = "idle";
+            state.isLoaded = true;
         });
         builder.addCase(fetchBooks.rejected, (state) => {
             state.status = "idle";
+            state.isLoaded = false;
         });
         builder.addCase(fetchBookById.pending, (state) => {
             state.status = "pendingFetchBookById";

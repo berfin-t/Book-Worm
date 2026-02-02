@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 export default function HeroSection() {
     return(
         <>
-        <Box sx={{mt:"auto", minHeight:500, display:"flex", alignItems:"center"}}>
+        <Box sx={{mt:"auto", minHeight:500, display:"flex", alignItems:"center", mb:1}}>
             <Container>
                 <Box display="grid"
                  alignItems="center"
