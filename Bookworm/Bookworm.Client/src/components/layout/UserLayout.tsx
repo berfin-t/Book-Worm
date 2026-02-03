@@ -32,7 +32,7 @@ const buttonStyles = {
     },
 };
 
-export default function Navbar() {
+export default function UserLayout() {
     const { cart } = useAppSelector(state => state.cart);
     const { user } = useAppSelector(state => state.account);
     const dispatch = useAppDispatch();

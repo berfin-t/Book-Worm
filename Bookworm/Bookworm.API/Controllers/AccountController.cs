@@ -36,30 +36,31 @@ public class AccountController : ControllerBase
 
         var result = await _userManager.CheckPasswordAsync(user, loginDto.Password);
 
-        if (result)
-        {
-            var userCart = await GetOrCreate(loginDto.Username);
-            var cookiesCart = await GetOrCreate(Request.Cookies["customerId"]!);
-
-            if (userCart != null) {
-                foreach (var item in userCart.CartItems)
-                {
-                    cookiesCart.AddItem(item.Book, item.Quantity);
-                }
-                _context.Carts.Remove(userCart);
-            }
-
-            cookiesCart.CustomerId = loginDto.Username;
-            await _context.SaveChangesAsync();
-
-                return Ok(new UserDto
-            {
-                Name = user.Name!,
-                Token = await _tokenService.GenerateTokenAsync(user)
-            });
-        }
-
+        if (!result)
         return Unauthorized();
+
+    var roles = await _userManager.GetRolesAsync(user);
+
+    var userCart = await GetOrCreate(loginDto.Username);
+    var cookiesCart = await GetOrCreate(Request.Cookies["customerId"]!);
+
+    if (userCart != null)
+    {
+        foreach (var item in userCart.CartItems)
+            cookiesCart.AddItem(item.Book, item.Quantity);
+
+        _context.Carts.Remove(userCart);
+    }
+
+    cookiesCart.CustomerId = loginDto.Username;
+    await _context.SaveChangesAsync();
+
+    return Ok(new UserDto
+    {
+        Name = user.Name!,
+        Token = await _tokenService.GenerateTokenAsync(user),
+        Roles = roles.ToList() 
+    });
     }
 
     private async Task<Cart> GetOrCreate(string custId)
@@ -135,7 +136,8 @@ public class AccountController : ControllerBase
         return new UserDto
         {
             Name = user.Name!,
-            Token = await _tokenService.GenerateTokenAsync(user)
+            Token = await _tokenService.GenerateTokenAsync(user),
+            Roles = (await _userManager.GetRolesAsync(user)).ToList()
         };
 
     }

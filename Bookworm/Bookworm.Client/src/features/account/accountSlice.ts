@@ -3,6 +3,11 @@ import type { IUser } from "../../model/IUser";
 import requests from "../../api/requests";
 import type { FieldValues } from "react-hook-form";
 import { router } from "../../router/Router";
+import {jwtDecode} from "jwt-decode";
+
+interface JwtPayload {
+  role: string[] | string;
+}
 
 interface AccountState {
     user: IUser | null;
@@ -27,24 +32,24 @@ export const loginUser = createAsyncThunk<IUser, FieldValues>(
 )
 
 export const getUser = createAsyncThunk<IUser>(
-    "account/getUser",
-    async (_, thunkAPI) => {
-        thunkAPI.dispatch(setUser(JSON.parse(localStorage.getItem("user")!)));
-        try {
-            const user = await requests.Account.getUser();
-            localStorage.setItem("user", JSON.stringify(user));
-            return user;
-        }
-        catch (error: any) {
-            return thunkAPI.rejectWithValue({ error: error.data });
-        }
-    },
-    {
-        condition: () => {
-            if (!localStorage.getItem("user")) return false;
-        }
+  "account/getUser",
+  async (_, thunkAPI) => {
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser) {
+      thunkAPI.dispatch(setUser(JSON.parse(storedUser)));
     }
+
+    try {
+      const user = await requests.Account.getUser();
+      localStorage.setItem("user", JSON.stringify(user));
+      return user;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue({ error: error.data });
+    }
+  }
 );
+
 
 export const accountSlice = createSlice({
     name: "account",
@@ -61,8 +66,16 @@ export const accountSlice = createSlice({
     },
     extraReducers: (builder => {
         builder.addCase(loginUser.fulfilled, (state, action) => {
-            state.user = action.payload;
-        })
+            const token = action.payload.token;
+            const decoded = jwtDecode<JwtPayload>(token);
+
+                state.user = {
+                    ...action.payload,
+                    roles: Array.isArray(decoded.role)
+                    ? decoded.role
+                    : [decoded.role],
+                };
+        });
     })
 })
 

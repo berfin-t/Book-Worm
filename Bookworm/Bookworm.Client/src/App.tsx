@@ -2,24 +2,29 @@
 import { Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
-import { useAppDispatch } from "./store/store";
+import { useAppDispatch, useAppSelector } from "./store/store";
 import { getUser } from "./features/account/accountSlice";
 import { getCart } from "./features/cart/cartSlice";
-import Navbar from "./components/layout/Navbar";
+import AdminLayout from "./components/layout/AdminLayout";
+import UserLayout from "./components/layout/UserLayout";
 
 function App() {
 
     const dispatch = useAppDispatch();
     const [loading, setLoading] = useState(true);
+    const { user } = useAppSelector(state => state.account);
 
-    const initApp = async () => {
-        await dispatch(getCart());
-        await dispatch(getUser());
-    }
+    const isAdmin = user?.roles?.includes("Admin");
 
     useEffect(() => {
-        initApp().then(() => setLoading(false));
-    }, []);
+        const initApp = async () => {
+            await dispatch(getUser());   
+            await dispatch(getCart());   
+            setLoading(false);
+        };
+
+        initApp();
+    }, [dispatch]);
 
     if (loading) return <CircularProgress />
     
@@ -27,7 +32,7 @@ function App() {
         <>
             <ToastContainer position="bottom-right" hideProgressBar theme="colored"/>
             <CssBaseline />
-            <Navbar />
+            {isAdmin ? <AdminLayout /> : <UserLayout />}
             <Container>
                 <Outlet />
             </Container>
