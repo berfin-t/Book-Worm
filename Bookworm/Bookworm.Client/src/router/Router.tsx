@@ -8,8 +8,8 @@ import LoginPage from "../features/account/LoginPage";
 import RegisterPage from "../features/account/RegisterPage";
 import CheckoutPage from "../features/checkout/CheckoutPage";
 import OrderDetails from "../features/orders/OrderDetails";
-import AdminPage from "../features/admin/AdminPage";
 import RoleGuard from "./RoleGuard.tsx";
+import DashboardPage from "../features/admin/DashboardPage.tsx";
 
 export const router = createBrowserRouter([
     {
@@ -22,9 +22,9 @@ export const router = createBrowserRouter([
                     { path: "/cart", element: <ShoppingCartPage /> },
             ] },
             {
-                element: <RoleGuard allowedRoles={["Admin", "Customer"]} />,
+                element: <RoleGuard allowedRoles={["Admin"]} />,
                     children: [
-                        { path: "/admin", element: <AdminPage /> }
+                        { path: "/dashboard", element: <DashboardPage /> }
                     ]
         },           
             { path: "/login", element: <LoginPage /> },

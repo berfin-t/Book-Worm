@@ -10,6 +10,10 @@ const authedLinks = [
     { title: "Login", to: "/login" },
 ];
 
+const links = [
+    { title: "Dashboard", to: "/dashboard"}
+];
+
 const buttonStyles = {
     color: "#FFF7ED", 
     textDecoration: "none",
@@ -57,6 +61,19 @@ export default function AdminLayout() {
                                 >
                                     Bookworm
                                 </Typography>
+
+                                <Stack direction="row">
+                                    {links.map((link) => (
+                                        <Button
+                                        key={link.to}
+                                        component={NavLink}
+                                        to={link.to}
+                                        sx={buttonStyles}
+                                        >
+                                        {link.title}
+                                        </Button>
+                                    ))}
+                                </Stack>
                             </Box>
 
                             <Box sx={{ display: "flex", alignItems: "center" }}>                           

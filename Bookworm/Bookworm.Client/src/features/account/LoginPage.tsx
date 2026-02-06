@@ -20,8 +20,17 @@ export default function LoginPage() {
     });
 
     async function submitForm(data: FieldValues) {
-        await dispatch(loginUser(data));
-        navigate("/books");
+        const result = await dispatch(loginUser(data));
+
+    if (loginUser.fulfilled.match(result)) {
+        const roles = result.payload.roles;
+
+        if (roles.includes("Admin")) {
+            navigate("/dashboard");
+        } else {
+            navigate("/books"); 
+        }
+    }
     }
 
     return (
@@ -57,7 +66,6 @@ export default function LoginPage() {
                             </Box>
 
                             <Typography variant="h5" fontWeight="bold">Bookworm</Typography>
-
                             <Typography variant="body2" color="text.secondary">Giriş Yap</Typography>
 
                         </Box>
