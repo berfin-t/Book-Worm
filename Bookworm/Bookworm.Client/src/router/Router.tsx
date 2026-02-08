@@ -9,29 +9,53 @@ import RegisterPage from "../features/account/RegisterPage";
 import CheckoutPage from "../features/checkout/CheckoutPage";
 import OrderDetails from "../features/orders/OrderDetails";
 import RoleGuard from "./RoleGuard.tsx";
-import DashboardPage from "../features/admin/DashboardPage.tsx";
+import DashboardPage from "../features/admin/dashboard/DashboardPage.tsx";
+import ProductsPage from "../features/admin/product/PoductsPage.tsx";
+import AdminLayout from "../components/layout/AdminLayout.tsx";
+import PublicLayout from "../components/layout/PublicLayout.tsx";
 
 export const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <App />,
+  {
+    path: "/",
+    element: <App />,
+    children: [
+
+      // PUBLIC 
+      {
+        element: <PublicLayout />,
         children: [
-            { element: <RoleGuard allowedRoles={["Customer"]} />, children: [
-                    {path: "/checkout", element: <CheckoutPage/>},
-                    {path: "/orders", element: <OrderDetails/>},                    
-                    { path: "/cart", element: <ShoppingCartPage /> },
-            ] },
-            {
-                element: <RoleGuard allowedRoles={["Admin"]} />,
-                    children: [
-                        { path: "/dashboard", element: <DashboardPage /> }
-                    ]
-        },           
-            { path: "/login", element: <LoginPage /> },
-            { path: "/register", element: <RegisterPage /> },
-            { path: "/", element: <HomePage /> },
-            { path: "/books", element: <BookPage /> },
-            { path: "/book/:id", element: <BookDetailPage /> },
-        ]
-    }
-])
+          { index: true, element: <HomePage /> },
+          { path: "books", element: <BookPage /> },
+          { path: "book/:id", element: <BookDetailPage /> },
+          { path: "login", element: <LoginPage /> },
+          { path: "register", element: <RegisterPage /> },
+        ],
+      },
+
+      // CUSTOMER 
+      {
+        element: <RoleGuard allowedRoles={["Customer"]} />,
+        children: [
+          { path: "cart", element: <ShoppingCartPage /> },
+          { path: "orders", element: <OrderDetails /> },
+          { path: "checkout", element: <CheckoutPage /> },
+        ],
+      },
+
+      // ADMIN 
+      {
+        element: <RoleGuard allowedRoles={["Admin"]} />,
+        children: [
+          {
+            element: <AdminLayout />,
+            children: [
+              { path: "dashboard", element: <DashboardPage /> },
+              { path: "products", element: <ProductsPage /> },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+]);
+

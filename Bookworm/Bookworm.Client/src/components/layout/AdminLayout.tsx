@@ -1,112 +1,118 @@
-import { AppBar, Box, Button, Container, Menu, MenuItem, Stack, Toolbar, Typography } from "@mui/material";
-import { NavLink } from "react-router-dom";
+import {Box, Button, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Typography} from "@mui/material";
+import { NavLink, Outlet } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import { KeyboardArrowDown } from "@mui/icons-material";
-import { useState } from "react";
 import { logout } from "../../features/account/accountSlice";
 
-const authedLinks = [
-    { title: "Register", to: "/register" },
-    { title: "Login", to: "/login" },
-];
+const drawerWidth = 240;
 
 const links = [
-    { title: "Dashboard", to: "/dashboard"}
+  { title: "Dashboard", to: "dashboard" },
+  { title: "ProductsPage", to: "products" }
 ];
 
-const buttonStyles = {
-    color: "#FFF7ED", 
-    textDecoration: "none",
-    fontWeight: 500,
-    "&:hover": {
-        color: "#FEF3C7", 
-        backgroundColor: "rgba(0,0,0,0.05)",
-    },
-    "&.active": {
-        color: "#78350F", 
-        fontWeight: "bold",
-    },
-};
-
 export default function AdminLayout() {
+    const { user } = useAppSelector(state => state.account);
+    const isAdmin = user?.roles?.includes("Admin");
+    const dispatch = useAppDispatch();
 
-    const {user} =useAppSelector(state => state.account);
-    const isAdmin = user?.roles?.includes("Admin"); 
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
-    const dispatch = useAppDispatch();   
-    
+    if (!isAdmin) return null;
 
-    function handleClick(event: React.MouseEvent<HTMLElement>) {
-        setAnchorEl(event.currentTarget);
-    }
+    return (
+        <Box sx={{ display: "flex" }}>
+            
+            <Drawer
+                variant="permanent"
+                sx={{
+                    width: drawerWidth,
+                    flexShrink: 0,
+                    [`& .MuiDrawer-paper`]: {
+                        width: drawerWidth,
+                        boxSizing: "border-box",
+                        backgroundColor: "#FFF7ED",
+                        display: "flex",
+                        flexDirection: "column",
+                        borderRight: "1px solid #FDE68A"
+                    }
+                }}
+            >
+                
+                <Box sx={{ p: 3 }}>
+                    <Typography
+                        variant="h6"
+                        sx={{ fontWeight: "bold", color: "#78350F" }}
+                    >
+                        Bookworm
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: "#78350F" }}>
+                        Admin Panel
+                    </Typography>
+                </Box>
 
-    function handleClose() {
-        setAnchorEl(null);
-    }
+                <Divider sx={{ borderColor: "#FDE68A" }} />
 
-    return(
-        <AppBar position="static"
-            sx={{
-                width: "100%",
-                backgroundColor: "#F59E0B" 
-            }}
-        >
-            <Container maxWidth="lg">
-                        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                                <Typography
-                                    variant="h6"
-                                    sx={{ fontWeight: "bold", color: "#FFF7ED" }}
-                                >
-                                    Bookworm
-                                </Typography>
+                
+                <List sx={{ flexGrow: 1 }}>
+                    {links.map(link => (
+                        <ListItem key={link.to} disablePadding>
+                            <ListItemButton
+                                component={NavLink}
+                                to={link.to}
+                                sx={{
+                                    color: "#78350F",
+                                    "&:hover": {
+                                        backgroundColor: "#FEF3C7"
+                                    },
+                                    "&.active": {
+                                        backgroundColor: "#FDE68A",
+                                        fontWeight: "bold"
+                                    }
+                                }}
+                            >
+                                <ListItemText primary={link.title} />
+                            </ListItemButton>
+                        </ListItem>
+                    ))}
+                </List>
 
-                                <Stack direction="row">
-                                    {links.map((link) => (
-                                        <Button
-                                        key={link.to}
-                                        component={NavLink}
-                                        to={link.to}
-                                        sx={buttonStyles}
-                                        >
-                                        {link.title}
-                                        </Button>
-                                    ))}
-                                </Stack>
-                            </Box>
+                <Divider sx={{ borderColor: "#FDE68A" }} />
 
-                            <Box sx={{ display: "flex", alignItems: "center" }}>                           
-                                                {
-                                                    isAdmin ? (
-                                                        <>
-                                                            <Button id="user-button" onClick={handleClick} endIcon={<KeyboardArrowDown />} sx={buttonStyles}>{user?.name}</Button>
-                            
-                                                            <Menu id="user-menu" anchorEl={anchorEl} open={open} onClose={handleClose}>
-                                                                
-                                                                <MenuItem
-                                                                    onClick={() => {
-                                                                        handleClose();
-                                                                        dispatch(logout());                                                                        
-                                                                    }}
-                                                                >
-                                                                    Logout
-                                                                </MenuItem>
-                                                            </Menu>
-                                                                    
-                                                        </>
-                                                    ) : (
-                                                            <Stack direction="row">
-                                                                {authedLinks.map(link =>
-                                                                    <Button key={link.to} component={NavLink} to={link.to} sx={buttonStyles}>{link.title}</Button>
-                                                                )}
-                                                            </Stack>
-                                                    )
-                                                }
-                            
-                                            </Box>
-                        </Toolbar>
-            </Container>
-        </AppBar>
+                
+                <Box sx={{ p: 2 }}>
+                    <Typography
+                        variant="body2"
+                        sx={{ mb: 1, color: "#78350F", fontWeight: 500 }}
+                    >
+                        {user?.name}
+                    </Typography>
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        sx={{
+                            color: "#78350F",
+                            borderColor: "#F59E0B",
+                            "&:hover": {
+                                backgroundColor: "#FEF3C7",
+                                borderColor: "#F59E0B"
+                            }
+                        }}
+                        onClick={() => dispatch(logout())}
+                    >
+                        Logout
+                    </Button>
+                </Box>
+            </Drawer>
+            
+            <Box
+                component="main"
+                sx={{
+                    flexGrow: 1,
+                    p: 3,
+                    backgroundColor: "#FFF7ED",
+                    minHeight: "100vh"
+                }}
+            >
+                <Outlet />
+            </Box>
+        </Box>
     );
 }

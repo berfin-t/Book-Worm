@@ -1,8 +1,10 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAppSelector } from "../store/store";
+import type { ReactNode } from "react";
 
 interface RoleGuardProps {
   allowedRoles: string[];
+  children?: ReactNode;
 }
 
 export default function RoleGuard({ allowedRoles }: RoleGuardProps) {
