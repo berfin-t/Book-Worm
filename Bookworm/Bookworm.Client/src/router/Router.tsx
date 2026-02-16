@@ -16,46 +16,47 @@ import PublicLayout from "../components/layout/PublicLayout.tsx";
 
 export const router = createBrowserRouter([
   {
-    path: "/",
-    element: <App />,
-    children: [
+  path: "/",
+  element: <App />,
+  children: [
 
-      // PUBLIC 
-      {
-        element: <PublicLayout />,
-        children: [
-          { index: true, element: <HomePage /> },
-          { path: "books", element: <BookPage /> },
-          { path: "book/:id", element: <BookDetailPage /> },
-          { path: "login", element: <LoginPage /> },
-          { path: "register", element: <RegisterPage /> },
-        ],
-      },
+    {
+      element: <PublicLayout />,
+      children: [
 
-      // CUSTOMER 
-      {
-        element: <RoleGuard allowedRoles={["Customer"]} />,
-        children: [
-          { path: "cart", element: <ShoppingCartPage /> },
-          { path: "orders", element: <OrderDetails /> },
-          { path: "checkout", element: <CheckoutPage /> },
-        ],
-      },
+        // PUBLIC
+        { index: true, element: <HomePage /> },
+        { path: "books", element: <BookPage /> },
+        { path: "book/:id", element: <BookDetailPage /> },
+        { path: "login", element: <LoginPage /> },
+        { path: "register", element: <RegisterPage /> },
 
-      // ADMIN 
-      {
-        element: <RoleGuard allowedRoles={["Admin"]} />,
-        children: [
-          {
-            element: <AdminLayout />,
-            children: [
-              { path: "dashboard", element: <DashboardPage /> },
-              { path: "products", element: <ProductsPage /> },
-            ],
-          },
-        ],
-      },
-    ],
-  },
+        // CUSTOMER (layout içinde olmalı)
+        {
+          element: <RoleGuard allowedRoles={["Customer"]} />,
+          children: [
+            { path: "cart", element: <ShoppingCartPage /> },
+            { path: "orders", element: <OrderDetails /> },
+            { path: "checkout", element: <CheckoutPage /> },
+          ],
+        },
+      ],
+    },
+
+    // ADMIN ayrı layout
+    {
+      element: <RoleGuard allowedRoles={["Admin"]} />,
+      children: [
+        {
+          element: <AdminLayout />,
+          children: [
+            { path: "dashboard", element: <DashboardPage /> },
+            { path: "products", element: <ProductsPage /> },
+          ],
+        },
+      ],
+    },
+  ],
+},
 ]);
 

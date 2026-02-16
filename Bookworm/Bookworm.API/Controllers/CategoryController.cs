@@ -6,7 +6,7 @@ namespace Bookworm.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class CategoryController : Controller
+    public class CategoryController : ControllerBase
     {
         private readonly DataContext _context;
         public CategoryController(DataContext context)

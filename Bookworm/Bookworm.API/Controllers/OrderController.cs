@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace ABookworm.API.Controller;
+namespace Bookworm.API.Controller;
 
 [Authorize]
 [ApiController]

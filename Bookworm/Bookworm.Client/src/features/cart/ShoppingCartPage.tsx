@@ -68,8 +68,7 @@ export default function ShoppingCartPage() {
                         <CartSummary />
                 </TableBody>
             </Table>
-        </TableContainer>
-            </Container>
+        </TableContainer>            
             <Box display="flex" justifyContent="flex-end" sx={{mt:3} }>
                 <Button component={Link} to="/checkout" variant="contained" 
                 sx={{
@@ -80,6 +79,7 @@ export default function ShoppingCartPage() {
                                     },
                 }} >Checkout</Button>
         </Box>
+        </Container>
         </>
     );
 }

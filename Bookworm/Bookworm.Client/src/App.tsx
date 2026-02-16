@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import { useAppDispatch } from "./store/store";
-import { getUser } from "./features/account/accountSlice";
+import { getUser, setUser } from "./features/account/accountSlice";
 import { getCart } from "./features/cart/cartSlice";
 
 function App() {
@@ -12,8 +12,13 @@ function App() {
 
   useEffect(() => {
     const initApp = async () => {
-      await dispatch(getUser());
-      await dispatch(getCart());
+      const storedUser = localStorage.getItem("user");
+
+      if (storedUser) {
+        dispatch(setUser(JSON.parse(storedUser)));
+        await dispatch(getUser());
+        await dispatch(getCart());
+      }
       setLoading(false);
     };
     initApp();
