@@ -21,7 +21,7 @@ export default function Book({ book }: Props) {
         <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <CardMedia
                 sx={{ height: 160, backgroundSize: "contain" }}
-                image={`http://localhost:5141/images/${book.imgUrl}`} />
+                image={book.imgUrl}/>
 
             <CardContent sx={{ flexGrow: 1 }}>
                 <Typography gutterBottom

@@ -18,9 +18,9 @@ export default function BookDetailPage() {
 
     const item = cart?.cartItems.find(i => i.bookId === book?.id);
 
-    useEffect(() => {
-        if(!book && id) dispatch(fetchBookById(parseInt(id)))
-    }, [id]);    
+  useEffect(() => {
+    if(id) dispatch(fetchBookById(parseInt(id)));
+}, [id, dispatch]);    
 
     if (loading === "pendingFetchBookById") return <CircularProgress />
     if (!book) return <div>Book not found</div>
@@ -28,7 +28,7 @@ export default function BookDetailPage() {
     return (
         <Grid container spacing={6} sx={{pt:5}}>
             <Grid size={{ xl: 3, lg: 4, md: 5, sm: 6, xs: 12 }}>
-                <img src={`http://localhost:5141/images/${book.imgUrl}`} style={{ width: '100%' }} />
+                <img src={book.imgUrl} style={{ width: '100%' }} />
             </Grid>
             <Grid size={{xl:9, lg:8, md:7, sm:6, xs:12}}>
                 <Typography variant="h3">{book.title}</Typography>
@@ -39,7 +39,7 @@ export default function BookDetailPage() {
                         <TableBody>
                             <TableRow>
                                 <TableCell variant="head">Yazar</TableCell>
-                                <TableCell>{book.author}</TableCell>
+                                <TableCell>{book.authorName}</TableCell>
                             </TableRow>
                             <TableRow>
                                 <TableCell variant="head">ISBN</TableCell>

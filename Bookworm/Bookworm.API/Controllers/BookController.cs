@@ -1,4 +1,5 @@
 ﻿using Bookworm.API.Data;
+using Bookworm.API.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,16 +27,29 @@ namespace Bookworm.API.Controllers
         public async Task<IActionResult> GetBook(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var book = await _context.Books.FindAsync(id);
-            
+            var book = await _context.Books
+        .Include(b => b.Author)
+        .Include(b => b.Category)
+        .Where(b => b.Id == id)
+        .Select(b => new BookDto
+        {
+            Id = b.Id,
+            Title = b.Title!,
+            AuthorName = b.Author!.Name!,
+            CategoryName = b.Category!.Name,
+            Isbn = b.Isbn!,
+            Price = (decimal)b.Price!,
+            Stock = (int)b.Stock!,
+            Description = b.Description,
+            IsActive = (bool)b.IsActive!,
+            ImgUrl = b.ImgUrl
+        })
+        .FirstOrDefaultAsync();
+
             if (book == null)
-            {
                 return NotFound();
-            }
 
             return Ok(book);
         }

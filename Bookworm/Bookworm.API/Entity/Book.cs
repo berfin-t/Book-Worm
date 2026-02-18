@@ -9,7 +9,6 @@ namespace Bookworm.API.Entity
 		public int Id { get; set; }
 		[Required]
 		public string? Title { get; set; }
-		public string? Author { get; set; }
 		public string? Isbn { get; set; }
 
 		public decimal? Price { get; set; }
@@ -20,5 +19,8 @@ namespace Bookworm.API.Entity
 
         public int CategoryId { get; set; }
 		public Category? Category { get; set; }
+
+		public int AuthorId {get;set;}
+		public Author? Author { get; set; }
 	}
 }

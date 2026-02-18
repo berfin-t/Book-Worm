@@ -17,7 +17,7 @@ export default function Info() {
                 {cart?.cartItems.map((item) => (
                     <ListItem key={item.bookId}>
                         <ListItemAvatar>
-                            <Avatar variant="square" src={`http://localhost:5141/images/${item.imgUrl}`}></Avatar>
+                            <Avatar variant="square" src={item.imgUrl}></Avatar>
                         </ListItemAvatar>
                         <ListItemText sx={{ mr: 2 }} primary={item.name} secondary={`x ${item.quantity}`} />
                         <Typography variant="body1">

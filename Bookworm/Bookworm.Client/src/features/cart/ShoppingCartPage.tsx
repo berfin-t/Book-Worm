@@ -36,7 +36,7 @@ export default function ShoppingCartPage() {
                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                         >
                             <TableCell component="th" scope="row">
-                                <img src={`http://localhost:5141/images/${item.imgUrl}`} style={{ height: 60 }} />
+                                <img src={item.imgUrl} style={{ height: 60 }} />
                             </TableCell>
                             <TableCell component="th" scope="row">
                                 {item.name}

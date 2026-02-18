@@ -78,7 +78,7 @@ export default function RecentlyAdded({books}: Props) {
                     boxShadow: 6}}}>
             <CardMedia
                 sx={{ height: 160, backgroundSize: "contain" }}
-                image={`http://localhost:5141/images/${book.imgUrl}`} />
+                image={book.imgUrl} />
 
             <CardContent sx={{ flexGrow: 1 }}>
                 <Typography gutterBottom
