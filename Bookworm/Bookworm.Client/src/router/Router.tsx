@@ -13,6 +13,8 @@ import DashboardPage from "../features/admin/dashboard/DashboardPage.tsx";
 import ProductsPage from "../features/admin/product/PoductsPage.tsx";
 import AdminLayout from "../components/layout/AdminLayout.tsx";
 import PublicLayout from "../components/layout/PublicLayout.tsx";
+import AuthorPage from "../features/author/AuthorPage.tsx";
+import AuthorDetailPage from "../features/author/AuthorDetailPage.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -38,6 +40,8 @@ export const router = createBrowserRouter([
             { path: "cart", element: <ShoppingCartPage /> },
             { path: "orders", element: <OrderDetails /> },
             { path: "checkout", element: <CheckoutPage /> },
+            { path: "authors", element: <AuthorPage/>},
+            { path: "author/:id", element: <AuthorDetailPage/>}
           ],
         },
       ],

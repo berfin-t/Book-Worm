@@ -40,10 +40,10 @@ namespace Bookworm.API.Controllers
             AuthorName = b.Author!.Name!,
             CategoryName = b.Category!.Name,
             Isbn = b.Isbn!,
-            Price = (decimal)b.Price!,
-            Stock = (int)b.Stock!,
+            Price = b.Price!,
+            Stock = b.Stock!,
             Description = b.Description,
-            IsActive = (bool)b.IsActive!,
+            IsActive = b.IsActive!,
             ImgUrl = b.ImgUrl
         })
         .FirstOrDefaultAsync();

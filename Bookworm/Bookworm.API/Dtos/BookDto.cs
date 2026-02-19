@@ -6,9 +6,9 @@ public class BookDto
     public string AuthorName { get; set; } = null!;
     public string CategoryName { get; set; } = null!;
     public string Isbn { get; set; } = null!;
-    public decimal Price { get; set; }
-    public int Stock { get; set; }
+    public decimal? Price { get; set; }
+    public int? Stock { get; set; }
     public string? Description { get; set; }
-    public bool IsActive { get; set; }
+    public bool? IsActive { get; set; }
     public string? ImgUrl { get; set; }
 }

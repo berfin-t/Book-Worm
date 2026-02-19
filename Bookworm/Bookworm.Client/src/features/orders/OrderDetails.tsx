@@ -105,7 +105,7 @@ export default function OrderDetails() {
                                 {selectedOrder?.orderItems.map((item) => (
                                     <TableRow key={item.id}>
                                         <TableCell>
-                                            <img src={`http://localhost:5141/images/${item.bookImage}`} style={{height: 60}}/>
+                                            <img src={item.bookImage} style={{height: 60}}/>
                                         </TableCell>
                                         <TableCell align="right">{item.bookName}</TableCell>
                                         <TableCell align="right">{ currencyTRY.format(item.price)}</TableCell>

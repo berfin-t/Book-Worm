@@ -7,6 +7,7 @@ export interface IBook{
     description: string;
     isActive: boolean;
     imgUrl: string;
+    authorId: number;
     authorName: string;   
     categoryName: string;
 }

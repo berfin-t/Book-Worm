@@ -3,12 +3,14 @@ import { cartSlice } from "../features/cart/cartSlice"
 import { bookSlice } from "../features/book/bookSlice"
 import { accountSlice } from "../features/account/accountSlice"
 import { useDispatch, useSelector } from "react-redux"
+import { authorSlice } from "../features/author/authorSlice"
 
 export const store = configureStore({
     reducer: {
         cart: cartSlice.reducer,
         book: bookSlice.reducer,
-        account: accountSlice.reducer
+        account: accountSlice.reducer,
+        author: authorSlice.reducer
     }
 })
 

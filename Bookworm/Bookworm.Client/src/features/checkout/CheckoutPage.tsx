@@ -10,6 +10,7 @@ import { useAppDispatch } from "../../store/store";
 import requests from "../../api/requests";
 import { clearCart } from "../cart/cartSlice";
 import { LoadingButton } from "@mui/lab";
+import { Link } from "react-router-dom";
 
 const steps = ["Teslimat Bilgileri", "Ödeme", "Sipariş Özeti"];
 
@@ -35,16 +36,16 @@ export default function CheckoutPage() {
 
     async function handleNext(data: FieldValues) {
         if(activeStep === 2) {
-            setLoading(true);
-            try {
+        setLoading(true);
+        try {
                 setOrderId(await requests.Order.create(data));
                 setActiveStep(activeStep + 1);
-                dispatch(clearCart());
+            dispatch(clearCart());
                 setLoading(false);
             }
             catch(error:any) {
-                console.log(error);
-                setLoading(false);
+            console.log(error);
+            setLoading(false);
             }
         } else {
             setActiveStep(activeStep + 1);
@@ -82,6 +83,7 @@ export default function CheckoutPage() {
                                         Sipariş numaranız <strong>#{orderId}</strong>. Siparişiniz onaylandığında size bir eposta göndereceğiz.
                                     </Typography>
                                     <Button 
+                                    component={Link} to="/orders"
                                     sx={{alignSelf: "start", 
                                         width: {xs: "100%", sm: "auto"},
                                     backgroundColor: "#F59E0B",

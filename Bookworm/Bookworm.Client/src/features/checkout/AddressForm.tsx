@@ -8,22 +8,22 @@ export default function () {
         <Grid container spacing={3}>
             <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
-                    {...register("firstname", { required: "firstname is required" })}
+                    {...register("firstName", { required: "firstname is required" })}
                     label="Enter firstname"
                     fullWidth autoFocus
                     sx={{ mb: 2 }}
                     size="small"
-                    error={!!errors.firstname}></TextField>
+                    error={!!errors.firstName}></TextField>
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
-                    {...register("lastname", { required: "lastname is required" })}
+                    {...register("lastName", { required: "lastname is required" })}
                     label="Enter Lastname"
                     fullWidth autoFocus
                     sx={{ mb: 2 }}
                     size="small"
-                    error={!!errors.lastname}></TextField>
+                    error={!!errors.lastName}></TextField>
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>
@@ -48,13 +48,13 @@ export default function () {
 
             <Grid size={{ xs: 12 }}>
                 <TextField
-                    {...register("addressline", { required: "addressline is required" })}
-                    label="Enter addressline"
+                    {...register("addresLine", { required: "addresline is required" })}
+                    label="Enter addresline"
                     fullWidth multiline
                     rows={4}
                     sx={{ mb: 2 }}
                     size="small"
-                    error={!!errors.addressline}></TextField>
+                    error={!!errors.addresLine}></TextField>
             </Grid>
         </Grid>
     );

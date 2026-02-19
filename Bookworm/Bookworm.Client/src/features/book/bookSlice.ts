@@ -61,3 +61,10 @@ export const {
     selectAll: selectAllBooks,
     selectTotal: selectTotalBooks
 } = booksAdapter.getSelectors((state: RootState) => state.book);
+
+export const selectBooksByAuthor = (state: RootState, authorId: number) => {
+    return selectAllBooks(state).filter(
+        (book) => book.authorId === authorId
+    );
+}
+

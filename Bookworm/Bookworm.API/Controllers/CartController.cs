@@ -65,28 +65,18 @@ public class CartController : ControllerBase
     private async Task<Cart> GetOrCreate(string custId)
     {
         var cart = await _context.Carts
-            .Include(c => c.CartItems)
-            .ThenInclude(c => c.Book)
-            .Where(c => c.CustomerId == Request.Cookies["customerId"])
-            .FirstOrDefaultAsync();
+        .Include(c => c.CartItems)
+        .ThenInclude(c => c.Book)
+        .FirstOrDefaultAsync(c => c.CustomerId == custId);
 
-        if(cart == null)
-        {
-            var customerId = Guid.NewGuid().ToString();
+        if (cart == null)
+    {
+        cart = new Cart { CustomerId = custId };
+        _context.Carts.Add(cart);
+        await _context.SaveChangesAsync();
+    }
 
-            var cookiesOptions = new CookieOptions
-            {
-                IsEssential = true,
-                Expires = DateTime.Now.AddMonths(1)
-            };
-
-            Response.Cookies.Append("customerId", customerId, cookiesOptions);
-            cart = new Cart { CustomerId = customerId };
-
-            _context.Carts.Add(cart);
-            await _context.SaveChangesAsync();
-        }
-        return cart;
+    return cart;
     }
 
     private CartDto CartToDto(Cart cart)

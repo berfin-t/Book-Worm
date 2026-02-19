@@ -45,12 +45,18 @@ const Order = {
     create:(formData:any) => queries.post("order", formData)
 }
 
+const Author = {
+    list:()=>queries.get("author"),
+    details: (id: number) => queries.get(`author/${id}`)
+}
+
 const requests = {
     Book,
     Cart,
     Category,
     Account,
-    Order
+    Order,
+    Author
 }
 export default requests 
 
