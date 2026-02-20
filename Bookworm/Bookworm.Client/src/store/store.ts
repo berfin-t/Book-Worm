@@ -5,6 +5,7 @@ import { accountSlice } from "../features/account/accountSlice"
 import { useDispatch, useSelector } from "react-redux"
 import { authorSlice } from "../features/author/authorSlice"
 import categorySlice from "../features/category/categorySlice"
+import { orderSlice } from "../features/orders/orderSlice"
 
 export const store = configureStore({
     reducer: {
@@ -12,7 +13,8 @@ export const store = configureStore({
         book: bookSlice.reducer,
         account: accountSlice.reducer,
         author: authorSlice.reducer,
-        category: categorySlice
+        category: categorySlice,
+        order: orderSlice.reducer
     }
 })
 

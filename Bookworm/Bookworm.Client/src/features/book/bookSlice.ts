@@ -37,6 +37,8 @@ export const bookSlice = createSlice({
         }
     },
     extraReducers: (builder => {
+
+        // List
         builder.addCase(fetchBooks.pending, (state) => {
             state.status = "pendingFetchBooks";
         });
@@ -49,6 +51,7 @@ export const bookSlice = createSlice({
             state.status = "idle";
             state.isLoaded = false;
         });
+        // Details
         builder.addCase(fetchBookById.pending, (state) => {
             state.status = "pendingFetchBookById";
         });

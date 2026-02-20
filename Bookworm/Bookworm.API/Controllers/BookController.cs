@@ -17,11 +17,28 @@ namespace Bookworm.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetBooks()
+public async Task<IActionResult> GetBooks()
+{
+    var books = await _context.Books
+        .Include(b => b.Author)
+        .Include(b => b.Category)
+        .Select(b => new BookDto
         {
-            var books = await _context.Books.ToListAsync();
-            return Ok(books);
-        }
+            Id = b.Id,
+            Title = b.Title!,
+            AuthorName = b.Author!.Name,
+            CategoryName = b.Category!.Name,
+            Isbn = b.Isbn!,
+            Price = b.Price!,
+            Stock = b.Stock!,
+            Description = b.Description,
+            IsActive = b.IsActive!,
+            ImgUrl = b.ImgUrl
+        })
+        .ToListAsync();
+
+    return Ok(books);
+}
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBook(int? id)

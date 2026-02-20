@@ -15,6 +15,7 @@ import AdminLayout from "../components/layout/AdminLayout.tsx";
 import PublicLayout from "../components/layout/PublicLayout.tsx";
 import AuthorPage from "../features/author/AuthorPage.tsx";
 import AuthorDetailPage from "../features/author/AuthorDetailPage.tsx";
+import OrdersPage from "../features/admin/order/OrdersPage.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -32,16 +33,15 @@ export const router = createBrowserRouter([
         { path: "book/:id", element: <BookDetailPage /> },
         { path: "login", element: <LoginPage /> },
         { path: "register", element: <RegisterPage /> },
-
-        // CUSTOMER (layout içinde olmalı)
+        { path: "authors", element: <AuthorPage/>},
+        { path: "author/:id", element: <AuthorDetailPage/>},
+        // CUSTOMER 
         {
           element: <RoleGuard allowedRoles={["Customer"]} />,
           children: [
             { path: "cart", element: <ShoppingCartPage /> },
             { path: "orders", element: <OrderDetails /> },
-            { path: "checkout", element: <CheckoutPage /> },
-            { path: "authors", element: <AuthorPage/>},
-            { path: "author/:id", element: <AuthorDetailPage/>}
+            { path: "checkout", element: <CheckoutPage /> },            
           ],
         },
       ],
@@ -56,6 +56,7 @@ export const router = createBrowserRouter([
           children: [
             { path: "dashboard", element: <DashboardPage /> },
             { path: "products", element: <ProductsPage /> },
+            { path: "adminOrders", element: <OrdersPage /> }
           ],
         },
       ],

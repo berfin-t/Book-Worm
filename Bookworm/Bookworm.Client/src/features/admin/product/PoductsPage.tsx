@@ -37,7 +37,7 @@ export default function ProductsPage() {
     const columns: GridColDef[] = [
         {field: "id", headerName: "ID", width:80},
         { field: "title", headerName: "Kitap Adı", flex: 1 },
-        { field: "author", headerName: "Yazar", width: 180 },
+        { field: "authorName", headerName: "Yazar", width: 180 },
         { field: "price", headerName: "Fiyat", width: 120, type: "number" },
         { field: "stock", headerName: "Stok", width: 120, type: "number" },
         {

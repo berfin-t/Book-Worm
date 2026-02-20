@@ -6,8 +6,9 @@ import { logout } from "../../features/account/accountSlice";
 const drawerWidth = 240;
 
 const links = [
-  { title: "Dashboard", to: "dashboard" },
-  { title: "ProductsPage", to: "products" }
+    { title: "Dashboard", to: "dashboard" },
+    { title: "Products Page", to: "products" },
+    { title: "Orders Page", to: "adminOrders" }
 ];
 
 export default function AdminLayout() {

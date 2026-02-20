@@ -30,7 +30,7 @@ export const authorSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
 
-        // 🔹 LIST
+        //LIST
         builder.addCase(fetchAuthors.pending, (state) => {
             state.status = "pendingFetchAuthors";
         });
@@ -45,7 +45,7 @@ export const authorSlice = createSlice({
             state.status = "idle";
         });
 
-        // 🔹 DETAIL
+        //DETAIL
         builder.addCase(fetchAuthorById.pending, (state) => {
             state.status = "pendingFetchAuthorById";
         });

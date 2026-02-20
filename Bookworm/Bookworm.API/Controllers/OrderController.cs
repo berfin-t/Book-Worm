@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bookworm.API.Controller;
 
-[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class OrderController: ControllerBase
@@ -21,6 +20,7 @@ public class OrderController: ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Customer")]
     public async Task<ActionResult<List<OrderDto>>> GetOrder()
     {
         return await _context.Orders
@@ -30,7 +30,18 @@ public class OrderController: ControllerBase
         .ToListAsync();
     }
 
+    [HttpGet("get-by-admin")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<List<OrderDto>>> GetOrderByAdmin()
+    {
+        return await _context.Orders
+        .Include(i=>i.OrderItems)
+        .OrderToDto()
+        .ToListAsync();
+    }
+
     [HttpGet("{id}")]
+    [Authorize(Roles = "Customer")]
         public async Task<ActionResult<OrderDto?>> GetOrder(int id)
         {
             return await _context.Orders
@@ -41,6 +52,7 @@ public class OrderController: ControllerBase
         }
 
     [HttpPost]
+    [Authorize(Roles = "Customer")]
     public async Task<ActionResult<Order>> CreateOrder(CreateOrderDto createOrderDto)
     {
         var cart = await _context.Carts
@@ -95,5 +107,24 @@ public class OrderController: ControllerBase
                 return CreatedAtAction(nameof(GetOrder), new {id = order.Id}, order.Id);
             
             return BadRequest(new ProblemDetails { Title = "Problem getting order" });
+    }
+
+    [HttpGet("count")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<int>> GetTotalOrderCount()
+    {
+        return await _context.Orders.CountAsync();
+    }
+
+    [HttpGet("today")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<List<OrderDto>>> GetTodayOrders()
+    {
+        var today = DateTime.UtcNow.Date;
+
+        return await _context.Orders
+            .Where(o => o.OrderDate >= today && o.OrderDate < today.AddDays(1))
+            .OrderToDto()
+            .ToListAsync();
     }
 }

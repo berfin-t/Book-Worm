@@ -43,8 +43,11 @@ const Account = {
 
 const Order = {
     list: () => queries.get("order"),
+    listByAdmin: () => queries.get("order/get-by-admin"),
     get: (id:number) => queries.get(`order/${id}`),
-    create:(formData:any) => queries.post("order", formData)
+    create:(formData:any) => queries.post("order", formData),
+    count: () => queries.get("/order/count"),
+    today: () => queries.get("/order/today")
 }
 
 const Author = {
