@@ -30,7 +30,9 @@ const Cart = {
 }
 
 const Category = {
-    list:() => queries.get("category")
+    list:() => queries.get("category"),
+    details: (id: number) => queries.get(`category/${id}`),
+    getCategoryWithCount: () => queries.get("category/with-count")
 }
 
 const Account = {

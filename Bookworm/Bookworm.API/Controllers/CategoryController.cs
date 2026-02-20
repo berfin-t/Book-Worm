@@ -35,5 +35,35 @@ namespace Bookworm.API.Controllers
             return Ok(categoriesWithCount);
 
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCategoryById(int? id)
+        {
+            if(id == null)
+            return NotFound();
+            
+            var category = await _context.Categories
+            .Include(c => c.Books)
+            .Where(c => c.Id == id)
+            .Select(c => new
+            {
+                c.Id,
+                c.Name,
+                Books = c.Books.Select(b => new
+                {
+                    b.Id,
+                    b.Title,
+                    b.Price,
+                    b.ImgUrl
+                }).ToList()
+            })
+            .FirstOrDefaultAsync();
+
+            if (category == null)
+            {
+                return NotFound();
+            }
+            return Ok(category);
+        }
     }
 }

@@ -48,9 +48,9 @@ export default function Book({ book }: Props) {
                     variant="outlined"
                     loadingPosition="start"
                     startIcon={<AddShoppingCart />}
-                    loading={status === "pendingAddItem" + book.id}
+                    loading={status === `pendingAddItem${book.id}`}
                     onClick={() => dispatch(addItemToCart({bookId:book.id}))}
-                    color="success">Sepete Ekle</LoadingButton>
+                    color="success">Ekle</LoadingButton>
                     <Button component={Link} to={`/book/${book.id}`} variant="outlined" size="small" startIcon={<SearchIcon />}>View</Button>
             </CardActions>
         </Card>

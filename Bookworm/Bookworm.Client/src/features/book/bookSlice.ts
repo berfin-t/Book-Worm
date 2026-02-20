@@ -1,4 +1,4 @@
-import { createAsyncThunk, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from "@reduxjs/toolkit";
 import requests from "../../api/requests";
 import type { IBook } from "../../model/IBook";
 import type { RootState } from "../../store/store";
@@ -21,13 +21,21 @@ const booksAdapter = createEntityAdapter<IBook>();
 
 const initialState = booksAdapter.getInitialState({
     status: "idle",
-    isLoaded: false
+    isLoaded: false,
+    selectedCategoryId: null as number | null
 });
 
 export const bookSlice = createSlice({
     name: "book",
     initialState,
-    reducers: {},
+    reducers: {
+        setSelectedCategory: (state, action) => {
+            state.selectedCategoryId = action.payload;
+        },
+        clearSelectedCategory: (state) => {
+            state.selectedCategoryId = null;
+        }
+    },
     extraReducers: (builder => {
         builder.addCase(fetchBooks.pending, (state) => {
             state.status = "pendingFetchBooks";
@@ -67,4 +75,15 @@ export const selectBooksByAuthor = (state: RootState, authorId: number) => {
         (book) => book.authorId === authorId
     );
 }
+export const { setSelectedCategory, clearSelectedCategory } =
+    bookSlice.actions;
 
+export const selectBooksByCategory = createSelector(
+    [selectAllBooks, (state: RootState) => state.book.selectedCategoryId],
+    (books, selectedCategoryId) => {
+        if (!selectedCategoryId) return books;
+        return books.filter(
+            (book) => book.categoryId === selectedCategoryId
+        );
+    }
+);
