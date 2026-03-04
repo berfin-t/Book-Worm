@@ -10,6 +10,13 @@ export const fetchOrders = createAsyncThunk<IOrder[]>(
     }
 )
 
+export const fetchPendingOrders = createAsyncThunk<IOrder[]>(
+    "order/fetchPendingOrders",
+    async () => {
+        return await requests.Order.pending();
+    }
+)
+
 const orderAdapter = createEntityAdapter<IOrder>();
 
 const initialState = orderAdapter.getInitialState({
@@ -35,9 +42,26 @@ export const orderSlice = createSlice({
             state.status = "idle";
             state.isLoaded = false;
         });
+
+        // Pending Orders
+        builder.addCase(fetchPendingOrders.pending, (state) => {
+            state.status = "pendingFetchPendingOrders";
+        });
+        builder.addCase(fetchPendingOrders.fulfilled, (state, action) => {
+            orderAdapter.setAll(state, action.payload);
+            state.status = "idle";
+            state.isLoaded = true;
+        });
+        builder.addCase(fetchPendingOrders.rejected, (state) => {
+            state.status = "idle";
+            state.isLoaded = false;
+        });
     })
 })
 
 export const {
     selectAll: selectAllOrders
 } = orderAdapter.getSelectors((state: RootState) => state.order);
+
+export const selectPendingOrders = (state: RootState) => 
+    selectAllOrders(state).filter(order => order.orderStatus === 0);

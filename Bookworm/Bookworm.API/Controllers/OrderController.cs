@@ -127,4 +127,14 @@ public class OrderController: ControllerBase
             .OrderToDto()
             .ToListAsync();
     }
+
+    [HttpGet("pending-orders")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<List<OrderDto>>> GetPendingOrders()
+    {
+        return await _context.Orders
+            .Where(o => o.OrderStatus == 0)
+            .OrderToDto()
+            .ToListAsync();
+    }
 }

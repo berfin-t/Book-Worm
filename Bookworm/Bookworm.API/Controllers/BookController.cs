@@ -101,21 +101,60 @@ public async Task<IActionResult> CreateBook(BookCreateDto bookDto)
     _context.Books.Add(book);
     await _context.SaveChangesAsync();
 
-    // var result = new BookDto
-    // {
-    //     Id = book.Id,
-    //     Title = book.Title,
-    //     AuthorName = author.Name,
-    //     CategoryName = category.Name,
-    //     Isbn = book.Isbn,
-    //     Price = book.Price,
-    //     Stock = book.Stock,
-    //     Description = book.Description,
-    //     IsActive = book.IsActive,
-    //     ImgUrl = book.ImgUrl
-    // };
-
     return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book.Id);
 }
+
+// [HttpPost("edit")]
+// public async Task<IActionResult> EditBook(UpdateBookDto bookDto)
+// {
+//     if (!ModelState.IsValid)
+//         return BadRequest(ModelState);
+
+//     var book = await _context.Books.FindAsync(bookDto.Id);
+//     if (book == null)
+//         return NotFound("Book not found.");
+
+//     var category = await _context.Categories.FindAsync(bookDto.CategoryId);
+//     if (category == null)
+//         return BadRequest("Geçersiz kategori.");
+
+//     var author = await _context.Authors.FindAsync(bookDto.AuthorId);
+//     if (author == null)
+//         return BadRequest("Geçersiz yazar.");
+
+//     book.Title = bookDto.Title;
+//     book.Isbn = bookDto.Isbn;
+//     book.Price = bookDto.Price;
+//     book.Stock = bookDto.Stock;
+//     book.Description = bookDto.Description;
+//     book.IsActive = bookDto.IsActive;
+//     book.ImgUrl = bookDto.ImgUrl;
+//     book.AuthorId = author.Id;
+//     book.CategoryId = category.Id;
+
+//     await _context.SaveChangesAsync();
+
+//     var updatedBook = await _context.Books
+//         .Include(b => b.Author)
+//         .Include(b => b.Category)
+//         .Where(b => b.Id == book.Id)
+//         .Select(b => new BookDto
+//         {
+//             Id = b.Id,
+//             Title = b.Title!,
+//             AuthorName = b.Author!.Name,
+//             CategoryName = b.Category!.Name,
+//             Isbn = b.Isbn!,
+//             Price = b.Price!,
+//             Stock = b.Stock!,
+//             Description = b.Description,
+//             IsActive = b.IsActive!,
+//             ImgUrl = b.ImgUrl
+//         })
+//         .FirstOrDefaultAsync();
+
+//     return Ok(updatedBook);
+// }
+    
     }
 }

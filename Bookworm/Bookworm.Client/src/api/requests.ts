@@ -1,5 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 import { store } from "../store/store";
+import { Pending } from "@mui/icons-material";
 
 axios.defaults.baseURL = "http://localhost:5141/api/";
 axios.defaults.withCredentials = true;
@@ -48,7 +49,8 @@ const Order = {
     get: (id:number) => queries.get(`order/${id}`),
     create:(formData:any) => queries.post("order", formData),
     count: () => queries.get("/order/count"),
-    today: () => queries.get("/order/today")
+    today: () => queries.get("/order/today"),
+    pending: () => queries.get("/order/pending-orders")
 }
 
 const Author = {

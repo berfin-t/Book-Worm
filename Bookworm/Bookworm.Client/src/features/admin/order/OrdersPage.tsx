@@ -1,65 +1,67 @@
-import { Box, CircularProgress, Paper } from "@mui/material";
-import { DataGrid, type GridColDef } from "@mui/x-data-grid";
+import { Box, CircularProgress } from "@mui/material";
+import { DataGrid, type GridColDef, type GridRenderCellParams } from "@mui/x-data-grid";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { useEffect } from "react";
-import { fetchOrders, selectAllOrders } from "../../orders/orderSlice";
+import { fetchPendingOrders, selectPendingOrders } from "../../orders/orderSlice";
+import type { IOrder, IOrderItem } from "../../../model/IOrder";
+import { currencyTRY } from "../../../utils/formatCurrency";
 
 export const OrderStatusMap: Record<number, string> = {
-  0: "Beklemede",
-  1: "Ödeme Alındı",
-  2: "Kargoya Verildi",
-  3: "Teslim Edildi",
-  4: "İptal Edildi"
-}
+  0: "Beklemede"
+};
 
-export default function OrdersPage() {
+export default function Grids() {
+  const dispatch = useAppDispatch();
+  const orders = useAppSelector(selectPendingOrders);
+  const { status, isLoaded } = useAppSelector(state => state.order);
 
-    const dispatch = useAppDispatch();
-    const orders = useAppSelector(selectAllOrders);
-    const {status, isLoaded} = useAppSelector(state => state.order);
+  useEffect(() => {
+    if (!isLoaded) dispatch(fetchPendingOrders());
+  }, [dispatch, isLoaded]);
 
-    useEffect(() => {
-        if(!isLoaded) dispatch(fetchOrders());
-    }, [dispatch, isLoaded]);
-
-    if(status === "pendingFetchOrders") {
-            return <CircularProgress/>;
-        }
-
-    const columns: GridColDef[] = [
-            {field: "id", headerName: "ID", width:80},
-            {
-  field: "orderStatus",
-  headerName: "Sipariş Durumu",
-  flex: 1,
-  renderCell: (params) => {
-    const status = params.row.orderStatus as number
-
-    return (
-      <span>
-        {OrderStatusMap[status]}
-      </span>
-    )
+  if (status === "pendingFetchPendingOrders") {
+    return <CircularProgress />;
   }
-},
-            { field: "orderDate", headerName: "Sipariş Tarihi", width: 180 },
-        ];
 
-    return(
-        <Paper sx={{ height: 650, width: "100%", p: 2 }}>
-            <Box
-            sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                mb: 2
-            }}
-        >            
-        </Box>
-            <DataGrid
-                rows={orders ?? []}
-                columns={columns}
-                pageSizeOptions={[5, 10, 20]}
-                sx={{ border: 0 }}/>
-            </Paper>
-    );
+  const columns: GridColDef[] = [
+    { field: "id", headerName: "ID", width: 80 },
+    {
+        field: "orderStatus",
+        headerName: "Sipariş Durumu",
+        flex: 1,
+        renderCell: (params: GridRenderCellParams<IOrder>) => {
+            const status = params.value ?? -1;
+            return <span>{OrderStatusMap[status] ?? "Bilinmiyor"}</span>;
+    }
+    },
+    {
+        field: "orderDate",
+        headerName: "Sipariş Tarihi",
+        width: 180,
+        renderCell: (params: GridRenderCellParams<IOrder>) => {
+            const date = params.value;
+            return <span>{date ? new Date(date).toLocaleDateString("tr-TR") : "-"}</span>;
+        }
+    },
+    { field: "firstName", headerName: "Müşteri Adı", width: 150 },
+{ field: "lastName", headerName: "Müşteri Soyadı", width: 150 },
+    { field: "subTotal", headerName: "Toplam Tutar", width: 150, renderCell: (params) => {
+        const value = params.value;
+        return <span>{currencyTRY.format(value)}</span>;
+    } },
+    {field: "phone", headerName: "Telefon", width: 150},
+    {field: "city", headerName: "Şehir", width: 150}
+  ];
+
+  return (
+    <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+      <DataGrid
+        rows={orders ?? []}
+        columns={columns}
+        pageSizeOptions={[5, 10, 20]}
+        sx={{ border: 0 }}
+        getRowId={(row) => row.id} 
+      />
+    </Box>
+  );
 }
