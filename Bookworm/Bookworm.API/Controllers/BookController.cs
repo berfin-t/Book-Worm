@@ -1,5 +1,6 @@
 ﻿using Bookworm.API.Data;
 using Bookworm.API.Dtos;
+using Bookworm.API.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -70,5 +71,51 @@ public async Task<IActionResult> GetBooks()
 
             return Ok(book);
         }
+
+        [HttpPost]
+public async Task<IActionResult> CreateBook(BookCreateDto bookDto)
+{
+    var category = await _context.Categories
+        .FirstOrDefaultAsync(c => c.Id == bookDto.CategoryId);
+    if (category == null)
+        return BadRequest("Geçersiz kategori.");
+
+    var author = await _context.Authors
+        .FirstOrDefaultAsync(a => a.Id == bookDto.AuthorId);
+    if (author == null)
+        return BadRequest("Geçersiz yazar.");
+
+    var book = new Book
+    {
+        Title = bookDto.Title,
+        Isbn = bookDto.Isbn,
+        Price = bookDto.Price,
+        Stock = bookDto.Stock,
+        Description = bookDto.Description,
+        IsActive = bookDto.IsActive,
+        ImgUrl = bookDto.ImgUrl,
+        AuthorId = author.Id,
+        CategoryId = category.Id
+    };
+
+    _context.Books.Add(book);
+    await _context.SaveChangesAsync();
+
+    // var result = new BookDto
+    // {
+    //     Id = book.Id,
+    //     Title = book.Title,
+    //     AuthorName = author.Name,
+    //     CategoryName = category.Name,
+    //     Isbn = book.Isbn,
+    //     Price = book.Price,
+    //     Stock = book.Stock,
+    //     Description = book.Description,
+    //     IsActive = book.IsActive,
+    //     ImgUrl = book.ImgUrl
+    // };
+
+    return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book.Id);
+}
     }
 }

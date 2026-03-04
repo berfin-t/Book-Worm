@@ -1,18 +1,20 @@
 import Paper from "@mui/material/Paper";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { fetchBooks, selectAllBooks } from "../../book/bookSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Box, Button, CircularProgress } from "@mui/material";
 import { DataGrid, GridActionsCellItem, type GridColDef } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import BookAddModal from "../modals/ProductAddModal";
 
 export default function ProductsPage() {   
 
     const dispatch = useAppDispatch();
     const books = useAppSelector(selectAllBooks);
     const {status, isLoaded} = useAppSelector(state => state.book);
+    const [openModal, setOpenModal] = useState(false);
 
     const handleEdit = (id: number) => {
     console.log("Edit book:", id);
@@ -23,7 +25,7 @@ export default function ProductsPage() {
     };
 
     const handleAdd = () => {
-        console.log("Add new book");
+        setOpenModal(true);
     };
 
     useEffect(() => {
@@ -38,6 +40,7 @@ export default function ProductsPage() {
         {field: "id", headerName: "ID", width:80},
         { field: "title", headerName: "Kitap Adı", flex: 1 },
         { field: "authorName", headerName: "Yazar", width: 180 },
+        { field: "categoryName", headerName: "Kategori", width: 180 },
         { field: "price", headerName: "Fiyat", width: 120, type: "number" },
         { field: "stock", headerName: "Stok", width: 120, type: "number" },
         {
@@ -88,10 +91,16 @@ export default function ProductsPage() {
             </Button>
         </Box>
             <DataGrid
-                rows={books ?? []}
+                rows={books}
                 columns={columns}
+                getRowId={(row) => row.id}
                 pageSizeOptions={[5, 10, 20]}
                 sx={{ border: 0 }}/>
+
+                <BookAddModal
+                    open={openModal}
+                    onClose={() => setOpenModal(false)}
+                />
             </Paper>
     );
 }

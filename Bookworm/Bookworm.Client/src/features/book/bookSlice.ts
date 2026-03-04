@@ -2,6 +2,7 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } fr
 import requests from "../../api/requests";
 import type { IBook } from "../../model/IBook";
 import type { RootState } from "../../store/store";
+import type { ICategory } from "../../model/ICategory";
 
 export const fetchBooks = createAsyncThunk<IBook[]>(
     "catalog/fetchBooks",
@@ -16,6 +17,13 @@ export const fetchBookById = createAsyncThunk<IBook, number>(
         return await requests.Book.details(bookId);
     }
 )
+
+export const createBook = createAsyncThunk<IBook, IBook>(
+  "book/createBook",
+  async (book) => {
+    return await requests.Book.create(book);
+  }
+);
 
 const booksAdapter = createEntityAdapter<IBook>();
 
@@ -62,7 +70,19 @@ export const bookSlice = createSlice({
         builder.addCase(fetchBookById.rejected, (state) => {
             state.status = "idle";
         });
-    })
+
+        //Create
+        builder.addCase(createBook.pending, (state) => {
+            state.status = "pendingCreateBook";
+        });
+        builder.addCase(createBook.fulfilled, (state, action) => {
+            booksAdapter.addOne(state, action.payload);
+            state.status = "idle";
+        });  
+            builder.addCase(createBook.rejected, (state) => {
+        state.status = "idle";
+    });
+  })
 })
 
 export const {
@@ -90,3 +110,8 @@ export const selectBooksByCategory = createSelector(
         );
     }
 );
+
+export const selectAllCategories = (state: RootState): ICategory[] => {
+  const categoryState = state.category; 
+  return categoryState.ids.map(id => categoryState.entities[id]!);
+};

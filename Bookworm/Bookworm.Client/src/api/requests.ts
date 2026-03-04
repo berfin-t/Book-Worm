@@ -20,7 +20,8 @@ const queries = {
 
 const Book = {
     list: () => queries.get("book"),
-    details: (id: number) => queries.get(`book/${id}`)
+    details: (id: number) => queries.get(`book/${id}`),
+    create: (formData: any) => queries.post("book", formData)
 }
 
 const Cart = {
