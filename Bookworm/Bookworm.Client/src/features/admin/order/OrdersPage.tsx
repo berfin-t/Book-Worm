@@ -3,7 +3,7 @@ import { DataGrid, type GridColDef, type GridRenderCellParams } from "@mui/x-dat
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { useEffect } from "react";
 import { fetchPendingOrders, selectPendingOrders } from "../../orders/orderSlice";
-import type { IOrder, IOrderItem } from "../../../model/IOrder";
+import type { IOrder } from "../../../model/IOrder";
 import { currencyTRY } from "../../../utils/formatCurrency";
 
 export const OrderStatusMap: Record<number, string> = {

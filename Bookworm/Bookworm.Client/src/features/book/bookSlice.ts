@@ -70,7 +70,6 @@ export const bookSlice = createSlice({
         builder.addCase(fetchBookById.rejected, (state) => {
             state.status = "idle";
         });
-
         //Create
         builder.addCase(createBook.pending, (state) => {
             state.status = "pendingCreateBook";
@@ -81,7 +80,7 @@ export const bookSlice = createSlice({
         });  
             builder.addCase(createBook.rejected, (state) => {
         state.status = "idle";
-    });
+        });        
   })
 })
 
@@ -115,3 +114,8 @@ export const selectAllCategories = (state: RootState): ICategory[] => {
   const categoryState = state.category; 
   return categoryState.ids.map(id => categoryState.entities[id]!);
 };
+
+export const selectLowStockBooks = createSelector(
+    [selectAllBooks],
+    (books) => books.filter(book => book.stock <= 5)
+);
