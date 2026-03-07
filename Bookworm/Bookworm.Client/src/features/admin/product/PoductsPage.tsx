@@ -7,7 +7,8 @@ import { DataGrid, GridActionsCellItem, type GridColDef } from "@mui/x-data-grid
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import BookAddModal from "../modals/ProductAddModal";
+import BookAddModal from "../modals/ProductModal";
+import type { IBook } from "../../../model/IBook";
 
 export default function ProductsPage() {   
 
@@ -15,18 +16,25 @@ export default function ProductsPage() {
     const books = useAppSelector(selectAllBooks);
     const {status, isLoaded} = useAppSelector(state => state.book);
     const [openModal, setOpenModal] = useState(false);
+    const [editBook, setEditBook] = useState<IBook | null>(null);
 
     const handleEdit = (id: number) => {
-    console.log("Edit book:", id);
-    };
-
+    const bookToEdit = books.find(b => b.id === id);
+    if (!bookToEdit) {
+        console.error("Kitap bulunamadı:", id);
+        return;
+    }
+    setEditBook(bookToEdit); 
+    setOpenModal(true);       
+};
     const handleDelete = (id: number) => {
         console.log("Delete book:", id);
     };
 
     const handleAdd = () => {
-        setOpenModal(true);
-    };
+    setEditBook(null);        
+    setOpenModal(true);
+};
 
     useEffect(() => {
         if(!isLoaded) dispatch(fetchBooks());
@@ -98,9 +106,10 @@ export default function ProductsPage() {
                 sx={{ border: 0 }}/>
 
                 <BookAddModal
-                    open={openModal}
-                    onClose={() => setOpenModal(false)}
-                />
+    open={openModal}
+    onClose={() => setOpenModal(false)}
+    book={editBook} 
+/>
             </Paper>
     );
 }

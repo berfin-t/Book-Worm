@@ -3,6 +3,7 @@ import requests from "../../api/requests";
 import type { IBook } from "../../model/IBook";
 import type { RootState } from "../../store/store";
 import type { ICategory } from "../../model/ICategory";
+import axios from "axios";
 
 export const fetchBooks = createAsyncThunk<IBook[]>(
     "catalog/fetchBooks",
@@ -22,6 +23,26 @@ export const createBook = createAsyncThunk<IBook, IBook>(
   "book/createBook",
   async (book) => {
     return await requests.Book.create(book);
+  }
+);
+
+export const updateBook = createAsyncThunk(
+  "book/updateBook",
+  async (book: IBook) => {
+
+    const response = await axios.put(`/book/${book.id}`, {
+      title: book.title,
+      isbn: book.isbn,
+      price: book.price,
+      stock: book.stock,
+      description: book.description,
+      isActive: book.isActive,
+      imgUrl: book.imgUrl,
+      authorId: book.authorId,
+      categoryId: book.categoryId
+    });
+
+    return response.data;
   }
 );
 
@@ -80,6 +101,17 @@ export const bookSlice = createSlice({
         });  
             builder.addCase(createBook.rejected, (state) => {
         state.status = "idle";
+        });
+        //Update
+        builder.addCase(updateBook.pending, (state) => {
+            state.status = "pendingUpdateBook";
+        });
+        builder.addCase(updateBook.fulfilled, (state, action) => {
+            booksAdapter.upsertOne(state, action.payload);
+            state.status = "idle";
+        });
+        builder.addCase(updateBook.rejected, (state) => {
+            state.status = "idle";
         });        
   })
 })

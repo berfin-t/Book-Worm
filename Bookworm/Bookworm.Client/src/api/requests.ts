@@ -1,6 +1,5 @@
 import axios, { type AxiosResponse } from "axios";
 import { store } from "../store/store";
-import { Pending } from "@mui/icons-material";
 
 axios.defaults.baseURL = "http://localhost:5141/api/";
 axios.defaults.withCredentials = true;
@@ -16,14 +15,14 @@ const queries = {
     get: (url: string) => axios.get(url).then((response: AxiosResponse) => response.data),
     post: (url: string, body: {}) => axios.post(url, body).then((response: AxiosResponse) => response.data),
     put: (url: string, body: {}) => axios.put(url, body).then((response: AxiosResponse) => response.data),
-    delete: (url: string) => axios.delete(url).then((response: AxiosResponse) => response.data),
+    delete: (url: string) => axios.delete(url).then((response: AxiosResponse) => response.data)
 }
 
 const Book = {
     list: () => queries.get("book"),
     details: (id: number) => queries.get(`book/${id}`),
-    create: (formData: any) => queries.post("book", formData)
-    //lowStock: () => queries.get("book/low-stock")
+    create: (formData: any) => queries.post("book", formData),
+    update: (formData: any) => queries.put(`book/${formData.id}`, formData)
 }
 
 const Cart = {
