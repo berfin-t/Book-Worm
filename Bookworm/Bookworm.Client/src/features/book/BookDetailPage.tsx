@@ -1,4 +1,4 @@
-﻿import { CircularProgress, Divider, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
+﻿import { Button, CircularProgress, Divider, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { LoadingButton } from "@mui/lab";
@@ -23,7 +23,7 @@ export default function BookDetailPage() {
 }, [id, dispatch]);    
 
     if (loading === "pendingFetchBookById") return <CircularProgress />
-    if (!book) return <div>Book not found</div>
+    if (!book || !book.isActive) return <div>Book not found</div>;
 
     return (
         <Grid container spacing={6} sx={{pt:5}}>
@@ -58,6 +58,7 @@ export default function BookDetailPage() {
                 </TableContainer>
 
                 <Stack direction="row" spacing={2} sx={{ mt: 3 }} alignItems="center" >
+                    {book.isActive && book.stock > 0 ? (
                     <LoadingButton
                         variant="outlined"
                         loadingPosition="start"
@@ -66,6 +67,16 @@ export default function BookDetailPage() {
                         onClick={()=> dispatch(addItemToCart({bookId:book.id}))}>
                     Sepete Ekle
                     </LoadingButton>
+                    ):(
+                        <Button
+                                size="small"
+                                variant="outlined"
+                                disabled
+                                color="error"
+                            >
+                                Tükendi
+                            </Button>
+                    )}
                     {
                         item?.quantity! > 0 && (
                             <Typography>Sepetinize {item?.quantity} ürün eklendi</Typography>

@@ -14,14 +14,15 @@ interface Props {
 }
 
 export default function RecentlyAdded({books}: Props) {
-
+    
+    const activeBooks = books.filter(book => book.isActive);
     const {status} = useAppSelector(state=> state.cart);
     const dispatch=useAppDispatch(); 
     const [index, setIndex] = useState(0);
 
     const visibleCount = 5;
     const next=()=>{
-        if(index < books.length ) {
+        if(index < activeBooks.length ) {
             setIndex(index + 1);
         }
     };
@@ -64,7 +65,7 @@ export default function RecentlyAdded({books}: Props) {
                     display: "flex",
                     transform: `translateX(-${index * 220}px)`,
                     transition: "transform 0.4s ease"}}>
-                    {books.map(book => (
+                    {activeBooks.map(book => (
                 <Card
                     key={book.id}
                     sx={{
@@ -98,12 +99,14 @@ export default function RecentlyAdded({books}: Props) {
                 </Typography>
             </CardContent>
             <CardActions  sx={{ justifyContent: "space-between" }}>
-                <LoadingButton
-                    size="small"
-                    variant="outlined"
-                    loadingPosition="start"
-                    startIcon={<AddShoppingCart />}
-                    loading={status === "pendingAddItem" + book.id}
+                
+                {book.isActive && book.stock > 0 ? (
+                    <LoadingButton
+                        size="small"
+                        variant="outlined"
+                        loadingPosition="start"
+                        startIcon={<AddShoppingCart />}
+                        loading={status === "pendingAddItem" + book.id}
                     onClick={() => dispatch(addItemToCart({bookId:book.id}))}
                     color="success"
                     sx={{
@@ -111,6 +114,16 @@ export default function RecentlyAdded({books}: Props) {
                         px: 1,        
                         py: 0.5,      
                         fontSize: "0.75rem"}}>Sepete Ekle</LoadingButton>
+                    ):(
+                        <Button
+                                size="small"
+                                variant="outlined"
+                                disabled
+                                color="error"
+                            >
+                                Tükendi
+                            </Button>
+                    )}
                     <Button component={RouterLink} to={`/book/${book.id}`} variant="outlined" size="small" startIcon={<SearchIcon />}>View</Button>
             </CardActions>
         </Card>))}
@@ -120,7 +133,7 @@ export default function RecentlyAdded({books}: Props) {
             {/* Right Arrow */}
             <IconButton
                 onClick={next}
-                disabled={index >= books.length - visibleCount}
+                disabled={index >= activeBooks.length - visibleCount}
                 sx={{
                     position: "absolute",
                     right: -20,

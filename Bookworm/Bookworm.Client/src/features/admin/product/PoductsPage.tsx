@@ -1,6 +1,6 @@
 import Paper from "@mui/material/Paper";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
-import { fetchBooks, selectAllBooks } from "../../book/bookSlice";
+import { deleteBook, fetchBooks, selectAllBooks } from "../../book/bookSlice";
 import { useEffect, useState } from "react";
 import { Box, Button, CircularProgress } from "@mui/material";
 import { DataGrid, GridActionsCellItem, type GridColDef } from "@mui/x-data-grid";
@@ -28,8 +28,10 @@ export default function ProductsPage() {
     setOpenModal(true);       
 };
     const handleDelete = (id: number) => {
-        console.log("Delete book:", id);
-    };
+  if (window.confirm("Bu kitabı silmek istiyor musunuz?")) {
+    dispatch(deleteBook(id));
+  }
+};
 
     const handleAdd = () => {
     setEditBook(null);        
@@ -49,6 +51,8 @@ export default function ProductsPage() {
         { field: "title", headerName: "Kitap Adı", flex: 1 },
         { field: "authorName", headerName: "Yazar", width: 180 },
         { field: "categoryName", headerName: "Kategori", width: 180 },
+        {field: "isbn", headerName: "ISBN", width: 150},
+        {field: "isActive", headerName: "Aktif", width: 100, type: "boolean"},
         { field: "price", headerName: "Fiyat", width: 120, type: "number" },
         { field: "stock", headerName: "Stok", width: 120, type: "number" },
         {
@@ -65,7 +69,7 @@ export default function ProductsPage() {
             <GridActionsCellItem
                 icon={<DeleteIcon />}
                 label="Sil"
-                onClick={() => handleDelete(params.id as number)}
+                onClick={() => handleDelete(params.row.id)}
                 showInMenu
             />
         ]

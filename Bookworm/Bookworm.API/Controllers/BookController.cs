@@ -70,7 +70,7 @@ public async Task<IActionResult> GetBooks()
                 return NotFound();
 
             return Ok(book);
-        }
+        }        
 
         [HttpPost]
 public async Task<IActionResult> CreateBook(BookCreateDto bookDto)
@@ -125,6 +125,21 @@ public async Task<IActionResult> UpdateBook(int id, UpdateBookDto dto)
     await _context.SaveChangesAsync();
 
     return Ok(book);
+}
+
+[HttpDelete("{id}")]
+public async Task<IActionResult> SoftDeleteBook(int id)
+{
+    var book = await _context.Books.FindAsync(id);
+
+    if (book == null)
+        return NotFound();
+
+    book.IsActive = false;
+
+    await _context.SaveChangesAsync();
+
+    return Ok("Kitap pasif hale getirildi.");
 }
     }
 }

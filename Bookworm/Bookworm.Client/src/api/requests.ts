@@ -22,7 +22,8 @@ const Book = {
     list: () => queries.get("book"),
     details: (id: number) => queries.get(`book/${id}`),
     create: (formData: any) => queries.post("book", formData),
-    update: (formData: any) => queries.put(`book/${formData.id}`, formData)
+    update: (formData: any) => queries.put(`book/${formData.id}`, formData),
+    delete: (id: number) => queries.delete(`book/${id}`)
 }
 
 const Cart = {

@@ -112,7 +112,11 @@ export const bookSlice = createSlice({
         });
         builder.addCase(updateBook.rejected, (state) => {
             state.status = "idle";
-        });        
+        }); 
+        //Delete
+        builder.addCase(deleteBook.fulfilled, (state, action) => {
+            booksAdapter.removeOne(state, action.payload);
+        });      
   })
 })
 
@@ -133,13 +137,17 @@ export const { setSelectedCategory, clearSelectedCategory } =
     bookSlice.actions;
 
 export const selectBooksByCategory = createSelector(
-    [selectAllBooks, (state: RootState) => state.book.selectedCategoryId],
-    (books, selectedCategoryId) => {
-        if (!selectedCategoryId) return books;
-        return books.filter(
-            (book) => book.categoryId === selectedCategoryId
-        );
-    }
+  [selectAllBooks, (state: RootState) => state.book.selectedCategoryId],
+  (books, selectedCategoryId) => {
+
+    let filtered = books.filter(book => book.isActive);
+
+    if (!selectedCategoryId) return filtered;
+
+    return filtered.filter(
+      (book) => book.categoryId === selectedCategoryId
+    );
+  }
 );
 
 export const selectAllCategories = (state: RootState): ICategory[] => {
@@ -150,4 +158,12 @@ export const selectAllCategories = (state: RootState): ICategory[] => {
 export const selectLowStockBooks = createSelector(
     [selectAllBooks],
     (books) => books.filter(book => book.stock <= 5)
+);
+
+export const deleteBook = createAsyncThunk(
+  "book/deleteBook",
+  async (id: number) => {
+    await axios.delete(`/book/${id}`);
+    return id;
+  }
 );

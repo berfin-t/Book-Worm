@@ -43,14 +43,28 @@ export default function Book({ book }: Props) {
             </CardContent>
 
             <CardActions>
-                <LoadingButton
-                    size="small"
-                    variant="outlined"
-                    loadingPosition="start"
-                    startIcon={<AddShoppingCart />}
-                    loading={status === `pendingAddItem${book.id}`}
-                    onClick={() => dispatch(addItemToCart({bookId:book.id}))}
-                    color="success">Ekle</LoadingButton>
+                {book.isActive && book.stock > 0 ? (
+    <LoadingButton
+        size="small"
+        variant="outlined"
+        loadingPosition="start"
+        startIcon={<AddShoppingCart />}
+        loading={status === `pendingAddItem${book.id}`}
+        onClick={() => dispatch(addItemToCart({ bookId: book.id }))}
+        color="success"
+    >
+        Ekle
+    </LoadingButton>
+) : (
+    <Button
+        size="small"
+        variant="outlined"
+        disabled
+        color="error"
+    >
+        Tükendi
+    </Button>
+)}
                     <Button component={Link} to={`/book/${book.id}`} variant="outlined" size="small" startIcon={<SearchIcon />}>View</Button>
             </CardActions>
         </Card>
