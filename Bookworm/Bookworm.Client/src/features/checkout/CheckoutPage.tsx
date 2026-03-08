@@ -40,7 +40,7 @@ export default function CheckoutPage() {
         try {
                 setOrderId(await requests.Order.create(data));
                 setActiveStep(activeStep + 1);
-            dispatch(clearCart());
+                dispatch(clearCart());
                 setLoading(false);
             }
             catch(error:any) {
@@ -60,9 +60,11 @@ export default function CheckoutPage() {
         <FormProvider {...methods }>
             <Paper sx={{ mx: "auto", mt: 4 }}>
                 <Grid container sx={{ p: 4 }} spacing={2 }>
+                    {activeStep !== steps.length && (
                     <Grid size={4 }>
                     <Info />
                     </Grid>
+                    ) }
                     <Grid size={activeStep !== steps.length ? 8: 12 } sx={{p:3}}>
                         <Box>
                             <Stepper activeStep={activeStep} 

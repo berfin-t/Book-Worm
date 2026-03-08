@@ -47,12 +47,12 @@ export default function PaymentForm() {
 
             <Grid size={{ xs: 6, md: 4 }}>
                 <TextField
-                    {...register("cardcvv", { required: "Cvv is required" })}
-                    label="Enter cvv"
+                    {...register("cardcvc", { required: "Cvc is required" })}
+                    label="Enter cvc"
                     fullWidth autoFocus
                     sx={{ mb: 2 }}
                     size="small"
-                    error={!!errors.card_cvv}></TextField>
+                    error={!!errors.cardcvc}></TextField>
             </Grid>            
         </Grid>
     );

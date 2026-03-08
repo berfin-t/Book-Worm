@@ -8,7 +8,7 @@ export default function Boxes() {
   <Grid sx={{xs:12, sm:6, md:3}}>
     <Card sx={{ p: 2 }}>
       <Typography variant="subtitle1">
-        Toplam Satış Sayısı: 0
+        Toplam Sipariş Sayısı: 0
       </Typography>
     </Card>
   </Grid>

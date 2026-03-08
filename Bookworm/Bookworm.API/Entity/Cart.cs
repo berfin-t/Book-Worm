@@ -33,6 +33,11 @@ public class Cart
             CartItems.Remove(item);
         }
     }
+
+    public double CalculateTotal()
+    {
+        return (double)CartItems.Sum(i => i.Book.Price * i.Quantity);
+    }
 }
 
 public class CartItem

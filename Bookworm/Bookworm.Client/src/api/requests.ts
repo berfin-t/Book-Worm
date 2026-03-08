@@ -1,5 +1,7 @@
-import axios, { type AxiosResponse } from "axios";
+import axios, { AxiosError, type AxiosResponse } from "axios";
 import { store } from "../store/store";
+import { toast } from "react-toastify";
+import { router } from "../router/Router";
 
 axios.defaults.baseURL = "http://localhost:5141/api/";
 axios.defaults.withCredentials = true;
@@ -9,6 +11,40 @@ axios.interceptors.request.use(requests => {
     if (token)
         requests.headers.Authorization = `Bearer ${token}`;
     return requests;
+})
+
+axios.interceptors.response.use(response => {
+    return response;
+}, (error: AxiosError) => {
+    const { data, status } = error.response as AxiosResponse;
+    switch(status)
+    {
+        case 400:
+            if(data.errors) {
+                const modelErrors : string[] = [];
+
+                for(const key in data.errors) {
+                    modelErrors.push(data.errors[key]);
+                }
+
+                throw modelErrors;
+            }
+            toast.error(data.title);
+            break;
+        case 401:
+            toast.error(data.title);
+            break;
+        case 404:
+            router.navigate("/not-found");
+            break;
+        case 500:
+            router.navigate("/server-error", { state: { error: data, status: status } });
+            break;
+        default:
+            break;
+
+    }
+    return Promise.reject(error.response);
 })
 
 const queries = {
