@@ -36,7 +36,7 @@ public class Cart
 
     public double CalculateTotal()
     {
-        return (double)CartItems.Sum(i => i.Book.Price * i.Quantity);
+        return (double)CartItems.Sum(i => (i.Book.Price ?? 0) * i.Quantity);
     }
 }
 

@@ -196,7 +196,7 @@ public class OrderController: ControllerBase
                 basketItem.Name = item.Book.Title;
                 basketItem.Category1 = "Saat";
                 basketItem.ItemType = BasketItemType.PHYSICAL.ToString();
-                basketItem.Price = ((double)item.Book.Price * item.Quantity).ToString();
+                basketItem.Price = (item.Book.Price * item.Quantity).ToString();
                 basketItems.Add(basketItem);
             }
 
