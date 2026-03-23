@@ -1,5 +1,11 @@
 import { Box, Card, Grid, Typography } from "@mui/material";
 
+interface DashboardStats {
+    totalOrders: number;
+    todaysOrders: number;
+    pendingOrders: number;
+}
+
 export default function Boxes() {
     return(
       <>

@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { authorSlice } from "../features/author/authorSlice"
 import categorySlice from "../features/category/categorySlice"
 import { orderSlice } from "../features/orders/orderSlice"
+import { commentSlice } from "../features/comment/commentSlice"  
 
 export const store = configureStore({
     reducer: {
@@ -14,7 +15,8 @@ export const store = configureStore({
         account: accountSlice.reducer,
         author: authorSlice.reducer,
         category: categorySlice,
-        order: orderSlice.reducer
+        order: orderSlice.reducer,
+        comment: commentSlice.reducer
     }
 })
 

@@ -95,13 +95,21 @@ const Author = {
     details: (id: number) => queries.get(`author/${id}`)
 }
 
+const Comment = {
+    listByBook: (bookId: number) => queries.get(`comment/book/${bookId}`),
+    add: (content: string, bookId: number) => queries.post("comment", { content, bookId }),
+    update: (id: number, content: string) => queries.put(`comment/${id}`, { content }),
+    delete: (id: number) => queries.delete(`comment/${id}`)
+}
+
 const requests = {
     Book,
     Cart,
     Category,
     Account,
     Order,
-    Author
+    Author,
+    Comment
 }
 export default requests 
 

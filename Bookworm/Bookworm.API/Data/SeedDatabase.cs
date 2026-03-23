@@ -25,6 +25,7 @@ namespace Bookworm.API.Data
             await SeedCategories(context);
             await SeedAuthors(context);
             await SeedBooks(context);
+            await SeedComments(context);
         }
 
         // ---------------- ROLES ----------------
@@ -60,6 +61,16 @@ namespace Bookworm.API.Data
 
             await userManager.CreateAsync(customer, "Customer_1");
             await userManager.AddToRoleAsync(customer, "Customer");
+
+            var customer2 = new AppUser
+            {
+                Name = "Customer User2",
+                UserName = "customer2",
+                Email = "customer2@mail.com"
+            };
+
+            await userManager.CreateAsync(customer2, "Customer_1");
+            await userManager.AddToRoleAsync(customer2, "Customer");
         }
 
         // ---------------- CATEGORIES ----------------
@@ -120,6 +131,50 @@ namespace Bookworm.API.Data
             context.Authors.AddRange(authors);
             await context.SaveChangesAsync();
         }
+
+        // ---------------- COMMENTS ----------------
+private static async Task SeedComments(DataContext context)
+{
+    if (context.Comments.Any()) return;
+
+    var books = await context.Books.ToListAsync();
+    var users = await context.Users.ToListAsync();
+
+    if (!books.Any() || !users.Any()) return;
+
+    var customer1 = users.First(u => u.UserName == "customer");
+    var customer2 = users.First(u => u.UserName == "customer2");
+
+    var comments = new List<Comment>
+    {
+        // 1984
+        new Comment { Content = "A dystopian masterpiece, truly terrifying.", Book = books.First(b => b.Title == "1984"), User = customer1 },
+        new Comment { Content = "Big Brother is watching. Unforgettable.", Book = books.First(b => b.Title == "1984"), User = customer2 },
+
+        // Animal Farm
+        new Comment { Content = "A brilliant political allegory.", Book = books.First(b => b.Title == "Animal Farm"), User = customer1 },
+        new Comment { Content = "Short but incredibly powerful.", Book = books.First(b => b.Title == "Animal Farm"), User = customer2 },
+
+        // Pride and Prejudice
+        new Comment { Content = "A timeless classic that everyone should read.", Book = books.First(b => b.Title == "Pride and Prejudice"), User = customer1 },
+        new Comment { Content = "Austen's wit and charm shine throughout.",Book = books.First(b => b.Title == "Pride and Prejudice"), User = customer2 },
+
+        // Crime and Punishment
+        new Comment { Content = "A gripping tale of crime and morality.",Book = books.First(b => b.Title == "Crime and Punishment"), User = customer1 },
+        new Comment { Content = "Dostoevsky's psychological depth is unmatched.",Book = books.First(b => b.Title == "Crime and Punishment"), User = customer2 },
+
+        // Harry Potter
+        new Comment { Content = "A magical journey that captivates readers of all ages.", Book = books.First(b => b.Title == "Harry Potter and the Sorcerer's Stone"), User = customer1 },
+        new Comment { Content = "The beginning of an epic series!", Book = books.First(b => b.Title == "Harry Potter and the Sorcerer's Stone"), User = customer2 },
+
+        // The Shining
+        new Comment { Content = "Terrifying and brilliantly written.", Book = books.First(b => b.Title == "The Shining"), User = customer1 },
+        new Comment { Content = "King at his absolute best.", Book = books.First(b => b.Title == "The Shining"), User = customer2 },
+    };
+
+    context.Comments.AddRange(comments);
+    await context.SaveChangesAsync();
+}
 
         // ---------------- BOOKS ----------------
         private static async Task SeedBooks(DataContext context)
