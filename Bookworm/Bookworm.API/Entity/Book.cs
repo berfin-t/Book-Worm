@@ -24,5 +24,6 @@ namespace Bookworm.API.Entity
 		public Author? Author { get; set; }
 
 		public ICollection<Comment>? Comments { get; set; }
+		public ICollection<Rating>? Ratings { get; set; }
 	}
 }

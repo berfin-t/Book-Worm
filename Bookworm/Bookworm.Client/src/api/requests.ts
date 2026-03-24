@@ -102,6 +102,10 @@ const Comment = {
     delete: (id: number) => queries.delete(`comment/${id}`)
 }
 
+const Rating = {
+    listByBook: (bookId: number) => queries.get(`rating/book/${bookId}`),
+}
+
 const requests = {
     Book,
     Cart,
@@ -109,7 +113,8 @@ const requests = {
     Account,
     Order,
     Author,
-    Comment
+    Comment,
+    Rating
 }
 export default requests 
 

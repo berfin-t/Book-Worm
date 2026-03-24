@@ -7,6 +7,7 @@ import { authorSlice } from "../features/author/authorSlice"
 import categorySlice from "../features/category/categorySlice"
 import { orderSlice } from "../features/orders/orderSlice"
 import { commentSlice } from "../features/comment/commentSlice"  
+import { ratingSlice } from "../features/rating/ratingSlice"
 
 export const store = configureStore({
     reducer: {
@@ -16,7 +17,8 @@ export const store = configureStore({
         author: authorSlice.reducer,
         category: categorySlice,
         order: orderSlice.reducer,
-        comment: commentSlice.reducer
+        comment: commentSlice.reducer,
+        rating: ratingSlice.reducer
     }
 })
 

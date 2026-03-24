@@ -1,16 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import requests from "../../api/requests";
-
-export interface Comment {
-    id: number;
-    content: string;
-    createdAt: string;
-    userName: string;
-    userFullName: string;
-}
+import type { IComment } from "../../model/IComment";
 
 interface CommentState {
-    comments: Comment[];
+    comments: IComment[];
     status: string;
 }
 
@@ -19,7 +12,7 @@ const initialState: CommentState = {
     status: "idle",
 };
 
-export const fetchCommentsByBook = createAsyncThunk<Comment[], number>(
+export const fetchCommentsByBook = createAsyncThunk<IComment[], number>(
     "comment/fetchByBook",
     async (bookId) => {
         return await requests.Comment.listByBook(bookId);
@@ -36,8 +29,8 @@ export const commentSlice = createSlice({
                 state.status = "pendingFetchComments";
             })
             .addCase(fetchCommentsByBook.fulfilled, (state, action) => {
-                state.comments = action.payload;
                 state.status = "idle";
+                state.comments = action.payload;
             })
             .addCase(fetchCommentsByBook.rejected, (state) => {
                 state.status = "idle";

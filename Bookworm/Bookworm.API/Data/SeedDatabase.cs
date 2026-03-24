@@ -26,6 +26,7 @@ namespace Bookworm.API.Data
             await SeedAuthors(context);
             await SeedBooks(context);
             await SeedComments(context);
+            await SeedRatings(context);
         }
 
         // ---------------- ROLES ----------------
@@ -174,12 +175,54 @@ private static async Task SeedComments(DataContext context)
 
     context.Comments.AddRange(comments);
     await context.SaveChangesAsync();
-}
+    }
 
-        // ---------------- BOOKS ----------------
-        private static async Task SeedBooks(DataContext context)
+    // ---------------- RATINGS ----------------
+    private static async Task SeedRatings(DataContext context)
+    {
+        if (context.Ratings.Any()) return;
+        var books = await context.Books.ToListAsync();
+        var users = await context.Users.ToListAsync();
+        if (!books.Any() || !users.Any()) return;
+
+        var customer1 = users.First(u => u.UserName == "customer");
+        var customer2 = users.First(u => u.UserName == "customer2");
+
+        var ratings = new List<Rating>
         {
-            if (context.Books.Any()) return;
+            // 1984
+            new Rating { Score = 5, Book = books.First(b => b.Title == "1984"), User = customer1 },
+            new Rating { Score = 4, Book = books.First(b => b.Title == "1984"), User = customer2 },
+
+            // Animal Farm
+            new Rating { Score = 5, Book = books.First(b => b.Title == "Animal Farm"), User = customer1 },
+            new Rating { Score = 4, Book = books.First(b => b.Title == "Animal Farm"), User = customer2 },
+
+            // Pride and Prejudice
+            new Rating { Score = 5, Book = books.First(b => b.Title == "Pride and Prejudice"), User = customer1 },
+            new Rating { Score = 5, Book = books.First(b => b.Title == "Pride and Prejudice"), User = customer2 },
+
+            // Crime and Punishment
+            new Rating { Score = 5, Book = books.First(b => b.Title == "Crime and Punishment"), User = customer1 },
+            new Rating { Score = 4, Book = books.First(b => b.Title == "Crime and Punishment"), User = customer2 },
+
+            // Harry Potter
+            new Rating { Score = 5, Book = books.First(b => b.Title == "Harry Potter and the Sorcerer's Stone"), User = customer1 },
+            new Rating { Score = 5, Book = books.First(b => b.Title == "Harry Potter and the Sorcerer's Stone"), User = customer2 },
+
+            // The Shining
+            new Rating { Score = 5, Book = books.First(b => b.Title == "The Shining"), User = customer1 },
+            new Rating { Score = 4, Book = books.First(b => b.Title == "The Shining"), User = customer2 },
+        };
+
+        context.Ratings.AddRange(ratings);
+        await context.SaveChangesAsync();
+    }
+
+    // ---------------- BOOKS ----------------
+    private static async Task SeedBooks(DataContext context)
+    {
+        if (context.Books.Any()) return;
 
             var authors = await context.Authors.ToListAsync();
             var categories = await context.Categories.ToListAsync();

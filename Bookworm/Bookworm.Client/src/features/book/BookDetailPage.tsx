@@ -7,7 +7,8 @@ import { currencyTRY } from "../../utils/formatCurrency";
 import { addItemToCart } from "../cart/cartSlice";
 import { fetchBookById, selectBookById } from "./bookSlice";
 import { useAppSelector, useAppDispatch } from "../../store/store";
-import Comments from "../comment/Commnets";
+import Comments from "../comment/Comments";
+import Rating from "../rating/Ratings";
 
 export default function BookDetailPage() {
 
@@ -86,6 +87,7 @@ export default function BookDetailPage() {
                     }
                 </Stack>
             </Grid>
+            <Rating bookId={Number(id)} />
             <Comments bookId={Number(id)} />
         </Grid>
     );

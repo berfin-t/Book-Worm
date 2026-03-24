@@ -17,6 +17,7 @@ namespace Bookworm.API.Data
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<Author> Authors => Set<Author>();
         public DbSet<Comment> Comments => Set<Comment>();
+        public DbSet<Rating> Ratings => Set<Rating>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -44,7 +45,18 @@ namespace Bookworm.API.Data
                 .WithMany()
                 .HasForeignKey(c => c.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
+            modelBuilder.Entity<Book>()
+                .HasMany(b => b.Ratings)    
+                .WithOne(r => r.Book)
+                .HasForeignKey(r => r.BookId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Rating>()
+                .HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Restrict);            
         }
     }
 }
