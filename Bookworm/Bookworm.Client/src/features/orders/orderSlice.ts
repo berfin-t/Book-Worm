@@ -17,6 +17,18 @@ export const fetchPendingOrders = createAsyncThunk<IOrder[]>(
     }
 )
 
+export const updateOrderStatus = createAsyncThunk(
+    "order/updateStatus",
+    async ({ id, orderStatus }: { id: number; orderStatus: number }, thunkAPI) => {
+        try {
+            await requests.Order.updateStatus(id, { orderStatus });
+            return { id, orderStatus };
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+);
+
 const orderAdapter = createEntityAdapter<IOrder>();
 
 const initialState = orderAdapter.getInitialState({
@@ -55,6 +67,21 @@ export const orderSlice = createSlice({
         builder.addCase(fetchPendingOrders.rejected, (state) => {
             state.status = "idle";
             state.isLoaded = false;
+        });
+
+        // Update Order Status
+        builder.addCase(updateOrderStatus.pending, (state) => {
+            state.status = "pendingUpdateOrderStatus";
+        });
+        builder.addCase(updateOrderStatus.fulfilled, (state, action) => {
+            orderAdapter.updateOne(state, {
+                id: action.payload.id,
+                changes: { orderStatus: action.payload.orderStatus }
+            });
+            state.status = "idle";
+        });
+        builder.addCase(updateOrderStatus.rejected, (state) => {
+            state.status = "idle";
         });
     })
 })

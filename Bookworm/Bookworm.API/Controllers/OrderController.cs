@@ -62,6 +62,25 @@ public class OrderController: ControllerBase
         }
     #endregion
 
+    #region Update Order Status
+[HttpPatch("{id}/update-status")]
+[Authorize(Roles = "Admin")]
+public async Task<ActionResult> UpdateOrderStatus(int id, [FromBody] UpdateOrderStatusDto dto)
+{
+    var order = await _context.Orders.FindAsync(id);
+
+    if (order == null) return NotFound();
+
+    order.OrderStatus = (OrderStatus)dto.OrderStatus;
+
+    var result = await _context.SaveChangesAsync() > 0;
+
+    if (result) return NoContent();
+
+    return BadRequest(new ProblemDetails { Title = "Problem updating order status" });
+}
+#endregion
+
     #region Create Order
     [HttpPost]
     [Authorize(Roles = "Customer")]

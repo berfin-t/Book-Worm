@@ -1,11 +1,12 @@
-import { Box, CircularProgress, Chip, Modal, Typography, Divider, IconButton } from "@mui/material";
+import { Box, CircularProgress, Chip, Modal, Typography, Divider, IconButton, Button, Select, MenuItem } from "@mui/material";
 import { DataGrid, type GridColDef, type GridRenderCellParams } from "@mui/x-data-grid";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { useEffect, useState } from "react";
-import { fetchPendingOrders, selectPendingOrders } from "../../orders/orderSlice";
 import type { IOrder } from "../../../model/IOrder";
 import { currencyTRY } from "../../../utils/formatCurrency";
 import CloseIcon from "@mui/icons-material/Close";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import { fetchOrders, selectAllOrders, updateOrderStatus } from "../../orders/orderSlice";
 
 export const OrderStatusMap: Record<number, string> = {
     0: "Beklemede",
@@ -24,18 +25,34 @@ const statusColorMap: Record<number, "warning" | "info" | "success" | "error" | 
 
 export default function Grids() {
     const dispatch = useAppDispatch();
-    const orders = useAppSelector(selectPendingOrders);
-    const { status, isLoaded } = useAppSelector(state => state.order);
-
-    const [selectedOrder, setSelectedOrder] = useState<IOrder | null>(null);
+    const orders = useAppSelector(selectAllOrders);
+    const { status } = useAppSelector(state => state.order);
 
     useEffect(() => {
-        if (!isLoaded) dispatch(fetchPendingOrders());
-    }, [dispatch, isLoaded]);
+        dispatch(fetchOrders());
+    }, [dispatch]);
 
-    if (status === "pendingFetchPendingOrders") {
+    const [selectedOrder, setSelectedOrder] = useState<IOrder | null>(null);
+    const [newStatus, setNewStatus] = useState<number>(0);
+
+    if (status === "pendingFetchOrders") {
         return <CircularProgress />;
     }
+
+    const handleOpenDetail = (order: IOrder) => {
+        setSelectedOrder(order);
+        setNewStatus(order.orderStatus);
+    };
+
+    const handleClose = () => {
+        setSelectedOrder(null);
+    };
+
+    const handleUpdateStatus = () => {
+        if (!selectedOrder) return;
+        dispatch(updateOrderStatus({ id: selectedOrder.id, orderStatus: newStatus }));
+        handleClose();
+    };
 
     const columns: GridColDef[] = [
         { field: "id", headerName: "ID", width: 80 },
@@ -65,11 +82,42 @@ export default function Grids() {
         },
         { field: "firstName", headerName: "Ad", width: 130 },
         { field: "lastName", headerName: "Soyad", width: 130 },
-        { field: "subTotal", headerName: "Toplam Tutar", width: 150,
+        {
+            field: "subTotal", headerName: "Toplam Tutar", width: 150,
             renderCell: (params) => <span>{currencyTRY.format(params.value)}</span>
         },
         { field: "phone", headerName: "Telefon", width: 150 },
-        { field: "city", headerName: "Şehir", width: 130 }
+        { field: "city", headerName: "Şehir", width: 130 },
+        {
+            field: "actions",
+            headerName: "İşlemler",
+            width: 120,
+            sortable: false,
+            filterable: false,
+            disableColumnMenu: true,
+            renderCell: (params: GridRenderCellParams<IOrder>) => (
+                <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={<VisibilityIcon fontSize="small" />}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenDetail(params.row as IOrder);
+                    }}
+                    sx={{
+        mt: 1,
+        backgroundColor: "#F59E0B",
+        color: "#fff", 
+        fontWeight: "bold",
+        "&:hover": {
+            backgroundColor: "#D97706"
+        },
+    }}
+                >
+                    Detay
+                </Button>
+            )
+        }
     ];
 
     return (
@@ -79,13 +127,11 @@ export default function Grids() {
                 columns={columns}
                 pageSizeOptions={[5, 10, 20]}
                 initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-                sx={{ border: 0, cursor: "pointer" }}
+                sx={{ border: 0 }}
                 getRowId={(row) => row.id}
-                onRowClick={(params) => setSelectedOrder(params.row as IOrder)}
             />
 
-            {/* ── Detay Modal ── */}
-            <Modal open={!!selectedOrder} onClose={() => setSelectedOrder(null)}>
+            <Modal open={!!selectedOrder} onClose={handleClose}>
                 <Box sx={{
                     position: "absolute", top: "50%", left: "50%",
                     transform: "translate(-50%, -50%)",
@@ -99,7 +145,7 @@ export default function Grids() {
                                 <Typography variant="h6" fontWeight={700}>
                                     Sipariş #{selectedOrder.id}
                                 </Typography>
-                                <IconButton onClick={() => setSelectedOrder(null)}>
+                                <IconButton onClick={handleClose}>
                                     <CloseIcon />
                                 </IconButton>
                             </Box>
@@ -151,6 +197,40 @@ export default function Grids() {
                                         </Typography>
                                     </Box>
                                 ))}
+                            </Box>
+
+                            <Divider sx={{ my: 2 }} />
+
+                            {/* Durum Güncelle */}
+                            <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+                                SİPARİŞ DURUMU GÜNCELLE
+                            </Typography>
+                            <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2 }}>
+                                <Select
+                                    size="small"
+                                    value={newStatus}
+                                    onChange={(e) => setNewStatus(Number(e.target.value))}
+                                    sx={{ minWidth: 200 }}
+                                >
+                                    {Object.entries(OrderStatusMap).map(([key, label]) => (
+                                        <MenuItem key={key} value={Number(key)}>{label}</MenuItem>
+                                    ))}
+                                </Select>
+                                <Button
+                                    variant="contained"
+                                    disabled={newStatus === selectedOrder.orderStatus || status === "pendingUpdateOrderStatus"}
+                                    onClick={handleUpdateStatus}
+                                    sx={{
+                                    mt: 1,
+                                    backgroundColor: "#F59E0B",
+                                    fontWeight: "bold",
+                                    "&:hover": {
+                                        backgroundColor: "#D97706"
+                                    },
+                                }}
+                                >
+                                    {status === "pendingUpdateOrderStatus" ? "Güncelleniyor..." : "Güncelle"}
+                                </Button>
                             </Box>
 
                             <Divider sx={{ my: 2 }} />
