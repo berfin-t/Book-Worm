@@ -89,7 +89,8 @@ const Order = {
     count: () => queries.get("/order/count"),
     today: () => queries.get("/order/today"),
     pending: () => queries.get("/order/pending-orders"),
-    updateStatus: (id: number, body: { orderStatus: number }) => queries.patch(`order/${id}/update-status`, body)
+    updateStatus: (id: number, body: { orderStatus: number }) => queries.patch(`order/${id}/update-status`, body),
+    stats: () => queries.get("order/stats")
 }
 
 const Author = {

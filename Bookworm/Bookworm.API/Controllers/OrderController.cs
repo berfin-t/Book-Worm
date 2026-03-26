@@ -62,6 +62,28 @@ public class OrderController: ControllerBase
         }
     #endregion
 
+    [HttpGet("stats")]
+    public async Task<IActionResult> GetDashboardStats()
+    {
+        
+    var stats = new
+    {
+        totalOrders = await _context.Orders.CountAsync(),
+        todaysOrders = await _context.Orders
+    .CountAsync(o => o.CreatedAt.HasValue &&
+                     o.CreatedAt.Value.Date == DateTime.UtcNow.Date),
+        totalUsers = await _context.Users.CountAsync(),
+        pendingOrders = await _context.Orders
+            .Where(o => o.OrderStatus == OrderStatus.Pending)
+            .CountAsync(),
+        totalRevenue = await _context.Orders
+            .Where(o => o.OrderStatus == OrderStatus.Completed)
+            .SumAsync(o => o.SubTotal + o.DeliveryFree)
+    };
+
+    return Ok(stats);
+}
+
     #region Update Order Status
 [HttpPatch("{id}/update-status")]
 [Authorize(Roles = "Admin")]

@@ -18,6 +18,8 @@ public class Order
     public decimal DeliveryFree { get; set; }
     public string? ConversationId { get; set; }
     public string? BasketId { get; set; }
+    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+
     public decimal GetTotal()
     {
         return SubTotal + DeliveryFree;
@@ -35,6 +37,7 @@ public class OrderItem
     public string BookImage { get; set; } = null!;
     public decimal Price { get; set; }
     public int Quantity { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
 
 public enum OrderStatus
@@ -42,5 +45,6 @@ public enum OrderStatus
     Pending,
     Approved,
     PaymentFailed,
-    Completed
+    Completed,
+    Cancelled
 }

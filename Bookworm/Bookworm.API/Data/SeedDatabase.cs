@@ -143,34 +143,32 @@ private static async Task SeedComments(DataContext context)
 
     if (!books.Any() || !users.Any()) return;
 
-    var customer1 = users.First(u => u.UserName == "customer");
-    var customer2 = users.First(u => u.UserName == "customer2");
+    var customer1 = users.FirstOrDefault(u => u.UserName == "customer");
+    var customer2 = users.FirstOrDefault(u => u.UserName == "customer2");
 
     var comments = new List<Comment>
     {
         // 1984
-        new Comment { Content = "A dystopian masterpiece, truly terrifying.", Book = books.First(b => b.Title == "1984"), User = customer1 },
-        new Comment { Content = "Big Brother is watching. Unforgettable.", Book = books.First(b => b.Title == "1984"), User = customer2 },
+        new Comment { Content = "A dystopian masterpiece, truly terrifying.", Book = books.FirstOrDefault(b => b.Title == "1984"), User = customer1 },
+        new Comment { Content = "Big Brother is watching. Unforgettable.", Book = books.FirstOrDefault(b => b.Title == "1984"), User = customer2 },
 
         // Animal Farm
-        new Comment { Content = "A brilliant political allegory.", Book = books.First(b => b.Title == "Animal Farm"), User = customer1 },
-        new Comment { Content = "Short but incredibly powerful.", Book = books.First(b => b.Title == "Animal Farm"), User = customer2 },
+        new Comment { Content = "A brilliant political allegory.", Book = books.FirstOrDefault(b => b.Title == "Animal Farm"), User = customer1 },
+        new Comment { Content = "Short but incredibly powerful.", Book = books.FirstOrDefault(b => b.Title == "Animal Farm"), User = customer2 },
 
         // Pride and Prejudice
-        new Comment { Content = "A timeless classic that everyone should read.", Book = books.First(b => b.Title == "Pride and Prejudice"), User = customer1 },
-        new Comment { Content = "Austen's wit and charm shine throughout.",Book = books.First(b => b.Title == "Pride and Prejudice"), User = customer2 },
-
+        new Comment { Content = "A timeless classic that everyone should read.", Book = books.FirstOrDefault(b => b.Title == "Pride and Prejudice"), User = customer1 },
+        new Comment { Content = "Austen's wit and charm shine throughout.",Book = books.FirstOrDefault(b => b.Title == "Pride and Prejudice"), User = customer2 },
         // Crime and Punishment
-        new Comment { Content = "A gripping tale of crime and morality.",Book = books.First(b => b.Title == "Crime and Punishment"), User = customer1 },
-        new Comment { Content = "Dostoevsky's psychological depth is unmatched.",Book = books.First(b => b.Title == "Crime and Punishment"), User = customer2 },
+        new Comment { Content = "A gripping tale of crime and morality.",Book = books.FirstOrDefault(b => b.Title == "Crime and Punishment"), User = customer1 },
+        new Comment { Content = "Dostoevsky's psychological depth is unmatched.",Book = books.FirstOrDefault(b => b.Title == "Crime and Punishment"), User = customer2 },
 
         // Harry Potter
-        new Comment { Content = "A magical journey that captivates readers of all ages.", Book = books.First(b => b.Title == "Harry Potter and the Sorcerer's Stone"), User = customer1 },
-        new Comment { Content = "The beginning of an epic series!", Book = books.First(b => b.Title == "Harry Potter and the Sorcerer's Stone"), User = customer2 },
-
+        new Comment { Content = "A magical journey that captivates readers of all ages.", Book = books.FirstOrDefault(b => b.Title == "Harry Potter and the Sorcerer's Stone"), User = customer1 },
+        new Comment { Content = "The beginning of an epic series!", Book = books.FirstOrDefault(b => b.Title == "Harry Potter and the Sorcerer's Stone"), User = customer2 },
         // The Shining
-        new Comment { Content = "Terrifying and brilliantly written.", Book = books.First(b => b.Title == "The Shining"), User = customer1 },
-        new Comment { Content = "King at his absolute best.", Book = books.First(b => b.Title == "The Shining"), User = customer2 },
+        new Comment { Content = "Terrifying and brilliantly written.", Book = books.FirstOrDefault(b => b.Title == "The Shining"), User = customer1 },
+        new Comment { Content = "King at his absolute best.", Book = books.FirstOrDefault(b => b.Title == "The Shining"), User = customer2 },
     };
 
     context.Comments.AddRange(comments);
@@ -185,34 +183,32 @@ private static async Task SeedComments(DataContext context)
         var users = await context.Users.ToListAsync();
         if (!books.Any() || !users.Any()) return;
 
-        var customer1 = users.First(u => u.UserName == "customer");
-        var customer2 = users.First(u => u.UserName == "customer2");
+        var customer1 = users.FirstOrDefault(u => u.UserName == "customer");
+        var customer2 = users.FirstOrDefault(u => u.UserName == "customer2");
 
         var ratings = new List<Rating>
         {
             // 1984
-            new Rating { Score = 5, Book = books.First(b => b.Title == "1984"), User = customer1 },
-            new Rating { Score = 4, Book = books.First(b => b.Title == "1984"), User = customer2 },
+            new Rating { Score = 5, Book = books.FirstOrDefault(b => b.Title == "1984"), User = customer1 },
+            new Rating { Score = 4, Book = books.FirstOrDefault(b => b.Title == "1984"), User = customer2 },
 
             // Animal Farm
-            new Rating { Score = 5, Book = books.First(b => b.Title == "Animal Farm"), User = customer1 },
-            new Rating { Score = 4, Book = books.First(b => b.Title == "Animal Farm"), User = customer2 },
+            new Rating { Score = 5, Book = books.FirstOrDefault(b => b.Title == "Animal Farm"), User = customer1 },
+            new Rating { Score = 4, Book = books.FirstOrDefault(b => b.Title == "Animal Farm"), User = customer2 },
 
             // Pride and Prejudice
-            new Rating { Score = 5, Book = books.First(b => b.Title == "Pride and Prejudice"), User = customer1 },
-            new Rating { Score = 5, Book = books.First(b => b.Title == "Pride and Prejudice"), User = customer2 },
-
+            new Rating { Score = 5, Book = books.FirstOrDefault(b => b.Title == "Pride and Prejudice"), User = customer1 },
+            new Rating { Score = 5, Book = books.FirstOrDefault(b => b.Title == "Pride and Prejudice"), User = customer2 },
             // Crime and Punishment
-            new Rating { Score = 5, Book = books.First(b => b.Title == "Crime and Punishment"), User = customer1 },
-            new Rating { Score = 4, Book = books.First(b => b.Title == "Crime and Punishment"), User = customer2 },
+            new Rating { Score = 5, Book = books.FirstOrDefault(b => b.Title == "Crime and Punishment"), User = customer1 },
+            new Rating { Score = 4, Book = books.FirstOrDefault(b => b.Title == "Crime and Punishment"), User = customer2 },
 
             // Harry Potter
-            new Rating { Score = 5, Book = books.First(b => b.Title == "Harry Potter and the Sorcerer's Stone"), User = customer1 },
-            new Rating { Score = 5, Book = books.First(b => b.Title == "Harry Potter and the Sorcerer's Stone"), User = customer2 },
-
+            new Rating { Score = 5, Book = books.FirstOrDefault(b => b.Title == "Harry Potter and the Sorcerer's Stone"), User = customer1 },
+            new Rating { Score = 5, Book = books.FirstOrDefault(b => b.Title == "Harry Potter and the Sorcerer's Stone"), User = customer2 },
             // The Shining
-            new Rating { Score = 5, Book = books.First(b => b.Title == "The Shining"), User = customer1 },
-            new Rating { Score = 4, Book = books.First(b => b.Title == "The Shining"), User = customer2 },
+            new Rating { Score = 5, Book = books.FirstOrDefault(b => b.Title == "The Shining"), User = customer1 },
+            new Rating { Score = 4, Book = books.FirstOrDefault(b => b.Title == "The Shining"), User = customer2 },
         };
 
         context.Ratings.AddRange(ratings);
@@ -229,14 +225,13 @@ private static async Task SeedComments(DataContext context)
 
             if (!authors.Any() || !categories.Any()) return;
 
-            var orwell = authors.First(a => a.Name == "George Orwell");
-            var austen = authors.First(a => a.Name == "Jane Austen");
-            var dostoevsky = authors.First(a => a.Name == "Fyodor Dostoevsky");
-            var rowling = authors.First(a => a.Name == "J.K. Rowling");
-            var king = authors.First(a => a.Name == "Stephen King");
-
-            var fiction = categories.First(c => c.Name == "Fiction");
-            var sciFi = categories.First(c => c.Name == "Science Fiction");
+            var orwell = authors.FirstOrDefault(a => a.Name == "George Orwell");
+            var austen = authors.FirstOrDefault(a => a.Name == "Jane Austen");
+            var dostoevsky = authors.FirstOrDefault(a => a.Name == "Fyodor Dostoevsky");
+            var rowling = authors.FirstOrDefault(a => a.Name == "J.K. Rowling");
+            var king = authors.FirstOrDefault(a => a.Name == "Stephen King");
+            var fiction = categories.FirstOrDefault(c => c.Name == "Fiction");
+            var sciFi = categories.FirstOrDefault(c => c.Name == "Science Fiction");
 
             var books = new List<Book>
             {
