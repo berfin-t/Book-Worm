@@ -11,7 +11,7 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
 } from "@mui/material";
 import { useAppDispatch } from "../../../store/store";
 import { createBook, updateBook } from "../../book/bookSlice";
@@ -26,7 +26,9 @@ interface Props {
 export default function BookAddModal({ open, onClose, book }: Props) {
   const dispatch = useAppDispatch();
   const [authors, setAuthors] = useState<{ id: number; name: string }[]>([]);
-  const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
+  const [categories, setCategories] = useState<{ id: number; name: string }[]>(
+    [],
+  );
 
   const [formData, setFormData] = useState<IBook>({
     id: 0,
@@ -40,10 +42,9 @@ export default function BookAddModal({ open, onClose, book }: Props) {
     stock: 0,
     description: "",
     isActive: true,
-    imgUrl: ""
+    imgUrl: "",
   });
 
-  // Yazar ve kategori listesini yükle
   useEffect(() => {
     async function fetchAuthorsAndCategories() {
       const authorsRes = await fetch("/api/authors");
@@ -58,21 +59,19 @@ export default function BookAddModal({ open, onClose, book }: Props) {
     fetchAuthorsAndCategories();
   }, []);
 
-  // Düzenleme modu için formData'yı hazırla
   useEffect(() => {
     if (book) {
-      const author = authors.find(a => a.id === book.authorId);
-      const category = categories.find(c => c.id === book.categoryId);
+      const author = authors.find((a) => a.id === book.authorId);
+      const category = categories.find((c) => c.id === book.categoryId);
 
       setFormData({
         ...book,
         authorId: author ? author.id : 0,
         categoryId: category ? category.id : 0,
         authorName: author ? author.name : "",
-        categoryName: category ? category.name : ""
+        categoryName: category ? category.name : "",
       });
     } else {
-      // Yeni kitap eklemek için formu temizle
       setFormData({
         id: 0,
         title: "",
@@ -85,7 +84,7 @@ export default function BookAddModal({ open, onClose, book }: Props) {
         stock: 0,
         description: "",
         isActive: true,
-        imgUrl: ""
+        imgUrl: "",
       });
     }
   }, [book, authors, categories, open]);
@@ -94,15 +93,18 @@ export default function BookAddModal({ open, onClose, book }: Props) {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: name === "price" || name === "stock" || name.includes("Id") ? Number(value) : value
+      [name]:
+        name === "price" || name === "stock" || name.includes("Id")
+          ? Number(value)
+          : value,
     });
   };
 
   const handleSave = async () => {
     const payload = {
       ...formData,
-      authorName: undefined, // Backend'e gönderme
-      categoryName: undefined // Backend'e gönderme
+      authorName: undefined,
+      categoryName: undefined,
     };
 
     if (book) {
@@ -117,9 +119,17 @@ export default function BookAddModal({ open, onClose, book }: Props) {
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>{book ? "Kitap Düzenle" : "Yeni Kitap Ekle"}</DialogTitle>
 
-      <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-        <TextField label="Kitap Adı" name="title" value={formData.title} onChange={handleChange} fullWidth />
-        
+      <DialogContent
+        sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
+      >
+        <TextField
+          label="Kitap Adı"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          fullWidth
+        />
+
         <FormControl fullWidth>
           <InputLabel>Yazar</InputLabel>
           <Select
@@ -138,8 +148,20 @@ export default function BookAddModal({ open, onClose, book }: Props) {
           </Select>
         </FormControl>
 
-        <TextField label="Açıklama" name="description" value={formData.description} onChange={handleChange} fullWidth />
-        <TextField label="ISBN" name="isbn" value={formData.isbn} onChange={handleChange} fullWidth />
+        <TextField
+          label="Açıklama"
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          fullWidth
+        />
+        <TextField
+          label="ISBN"
+          name="isbn"
+          value={formData.isbn}
+          onChange={handleChange}
+          fullWidth
+        />
 
         <FormControl fullWidth>
           <InputLabel>Kategori</InputLabel>
@@ -159,20 +181,48 @@ export default function BookAddModal({ open, onClose, book }: Props) {
           </Select>
         </FormControl>
 
-        <TextField label="Fiyat" name="price" type="number" value={formData.price} onChange={handleChange} />
-        <TextField label="Stok" name="stock" type="number" value={formData.stock} onChange={handleChange} />
+        <TextField
+          label="Fiyat"
+          name="price"
+          type="number"
+          value={formData.price}
+          onChange={handleChange}
+        />
+        <TextField
+          label="Stok"
+          name="stock"
+          type="number"
+          value={formData.stock}
+          onChange={handleChange}
+        />
 
         <FormControlLabel
-          control={<Checkbox checked={formData.isActive} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} />}
+          control={
+            <Checkbox
+              checked={formData.isActive}
+              onChange={(e) =>
+                setFormData({ ...formData, isActive: e.target.checked })
+              }
+            />
+          }
           label="Aktif mi?"
         />
 
-        <TextField label="Görsel URL" name="imgUrl" type="text" value={formData.imgUrl} onChange={handleChange} fullWidth />
+        <TextField
+          label="Görsel URL"
+          name="imgUrl"
+          type="text"
+          value={formData.imgUrl}
+          onChange={handleChange}
+          fullWidth
+        />
       </DialogContent>
 
       <DialogActions>
         <Button onClick={onClose}>İptal</Button>
-        <Button variant="contained" onClick={handleSave}>{book ? "Güncelle" : "Kaydet"}</Button>
+        <Button variant="contained" onClick={handleSave}>
+          {book ? "Güncelle" : "Kaydet"}
+        </Button>
       </DialogActions>
     </Dialog>
   );

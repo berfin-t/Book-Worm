@@ -7,7 +7,7 @@ import { DataGrid, GridActionsCellItem, type GridColDef } from "@mui/x-data-grid
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import BookAddModal from "../modals/ProductModal";
+import BookAddModal from "../modals/BookAddModal";
 import type { IBook } from "../../../model/IBook";
 
 export default function ProductsPage() {   

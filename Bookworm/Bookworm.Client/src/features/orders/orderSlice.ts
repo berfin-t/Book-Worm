@@ -21,8 +21,8 @@ export const updateOrderStatus = createAsyncThunk(
     "order/updateStatus",
     async ({ id, orderStatus }: { id: number; orderStatus: number }, thunkAPI) => {
         try {
-            await requests.Order.updateStatus(id, { orderStatus });
-            return { id, orderStatus };
+            const response = await requests.Order.updateStatus(id, { orderStatus });
+            return { id, orderStatus, trackingNumber: response?.trackingNumber ?? null };
         } catch (error) {
             return thunkAPI.rejectWithValue(error);
         }
@@ -75,11 +75,14 @@ export const orderSlice = createSlice({
         });
         builder.addCase(updateOrderStatus.fulfilled, (state, action) => {
             orderAdapter.updateOne(state, {
-                id: action.payload.id,
-                changes: { orderStatus: action.payload.orderStatus }
-            });
-            state.status = "idle";
+            id: action.payload.id,
+            changes: { 
+                orderStatus: action.payload.orderStatus,
+                trackingNumber: action.payload.trackingNumber  // ← ekle
+            }
         });
+        state.status = "idle";
+    });
         builder.addCase(updateOrderStatus.rejected, (state) => {
             state.status = "idle";
         });

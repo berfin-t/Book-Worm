@@ -20,6 +20,7 @@ public static class OrderExtensions
                 SubTotal = i.SubTotal,
                 OrderDate = i.OrderDate,
                 OrderStatus = i.OrderStatus,
+                TrackingNumber = i.TrackingNumber,
                 OrderItems = i.OrderItems.Select(item => new OrderItemDto
                 {
                     Id = item.Id,

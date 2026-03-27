@@ -9,7 +9,8 @@ export interface IOrder {
     lastName: string
     phone: string
     addresLine: string
-    city: string
+    city: string,
+    trackingNumber: string | null 
 }
 
 export interface IOrderItem {

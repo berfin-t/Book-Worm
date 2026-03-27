@@ -90,16 +90,43 @@ public class OrderController: ControllerBase
 public async Task<ActionResult> UpdateOrderStatus(int id, [FromBody] UpdateOrderStatusDto dto)
 {
     var order = await _context.Orders.FindAsync(id);
-
     if (order == null) return NotFound();
 
-    order.OrderStatus = (OrderStatus)dto.OrderStatus;
+    var newStatus = (OrderStatus)dto.OrderStatus;
+
+    // Business Rules — geçersiz geçişleri engelle
+    var invalidTransition = (order.OrderStatus, newStatus) switch
+    {
+        (not OrderStatus.Shipped, OrderStatus.Completed) =>
+            "Sipariş önce 'Kargoya Verildi' durumuna alınmalıdır.",
+        (OrderStatus.Completed, _) =>
+            "Tamamlanmış sipariş güncellenemez.",
+        (OrderStatus.Cancelled, _) =>
+            "İptal edilmiş sipariş güncellenemez.",
+        _ => null
+    };
+
+    if (invalidTransition != null)
+        return BadRequest(new ProblemDetails { Title = invalidTransition });
+
+    // Kargoya Verildi → takip numarası üret
+    if (newStatus == OrderStatus.Shipped && string.IsNullOrEmpty(order.TrackingNumber))
+        order.TrackingNumber = GenerateTrackingNumber();
+
+    order.OrderStatus = newStatus;
 
     var result = await _context.SaveChangesAsync() > 0;
 
-    if (result) return NoContent();
+    if (result) return Ok(new { trackingNumber = order.TrackingNumber });
 
     return BadRequest(new ProblemDetails { Title = "Problem updating order status" });
+}
+
+private static string GenerateTrackingNumber()
+{
+    var timestamp = DateTime.UtcNow.ToString("yyMMddHHmm");
+    var random = Random.Shared.Next(1000, 9999);
+    return $"TRK-{timestamp}-{random}";
 }
 #endregion
 

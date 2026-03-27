@@ -16,6 +16,7 @@ public class OrderDto
         public List<OrderItemDto> OrderItems { get; set; } = new();
         public decimal SubTotal { get; set; }
         public decimal DeliveryFree { get; set; }
+        public string? TrackingNumber { get; set; }
 }
 
 public class OrderItemDto

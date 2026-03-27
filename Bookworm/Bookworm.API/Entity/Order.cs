@@ -19,6 +19,7 @@ public class Order
     public string? ConversationId { get; set; }
     public string? BasketId { get; set; }
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+    public string? TrackingNumber { get; set; }
 
     public decimal GetTotal()
     {
@@ -42,9 +43,10 @@ public class OrderItem
 
 public enum OrderStatus
 {
-    Pending,
-    Approved,
-    PaymentFailed,
-    Completed,
+    Pending,       
+    Approved,       
+    Shipped,        
+    PaymentFailed, 
+    Completed,     
     Cancelled
 }
