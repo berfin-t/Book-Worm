@@ -2,11 +2,12 @@ import Box from "@mui/material/Box";
 import Boxes from "./Boxes";
 import LowStockBooks from "./LowStockBooks";
 import PendingOrders from "./PendingOrders";
+import MonthlyBooksChart from "./MonthlyBooksChart";
 
 export default function DashboardPage() {
     return(
       <>
-      <Boxes/>
+      <Boxes/>      
       <Box
         sx={{
           display: "flex",
@@ -21,6 +22,9 @@ export default function DashboardPage() {
         <Box sx={{ flex: 1 }}>
           <LowStockBooks />
         </Box>
+      </Box>
+      <Box>
+        <MonthlyBooksChart/>
       </Box>
       </>
     );

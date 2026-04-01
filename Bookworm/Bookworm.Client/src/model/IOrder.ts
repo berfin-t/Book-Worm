@@ -10,7 +10,8 @@ export interface IOrder {
     phone: string
     addresLine: string
     city: string,
-    trackingNumber: string | null 
+    trackingNumber: string | null,
+    createdAt: string
 }
 
 export interface IOrderItem {
