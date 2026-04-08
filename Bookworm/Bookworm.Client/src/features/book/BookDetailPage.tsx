@@ -36,6 +36,7 @@ export default function BookDetailPage() {
                 <Typography variant="h3">{book.title}</Typography>
                 <Divider sx={{ mb: 2 }} />
                 <Typography variant="h5" color="secondary">{currencyTRY.format(book.price)}</Typography>
+                <Divider sx={{ mb: 2 }} />
                 <TableContainer>
                     <Table>
                         <TableBody>

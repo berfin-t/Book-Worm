@@ -68,7 +68,7 @@ export default function AuthorDetailPage() {
                     <Grid key={book.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
                         <Card
                             component={Link}
-                            to={`/catalog/${book.id}`}
+                            to={`/book/${book.id}`}
                             sx={{
                                 height: "100%",
                                 textDecoration: "none",

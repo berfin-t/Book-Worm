@@ -100,7 +100,7 @@ const Author = {
 
 const Comment = {
     listByBook: (bookId: number) => queries.get(`comment/book/${bookId}`),
-    add: (content: string, bookId: number) => queries.post("comment", { content, bookId }),
+    add: (bookId: number,content: string) => queries.post("comment", { content, bookId }),
     update: (id: number, content: string) => queries.put(`comment/${id}`, { content }),
     delete: (id: number) => queries.delete(`comment/${id}`)
 }
