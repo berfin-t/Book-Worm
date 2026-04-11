@@ -2,7 +2,6 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } fr
 import requests from "../../api/requests";
 import type { IBook } from "../../model/IBook";
 import type { RootState } from "../../store/store";
-import type { ICategory } from "../../model/ICategory";
 import axios from "axios";
 
 export const fetchBooks = createAsyncThunk<IBook[]>(
@@ -51,7 +50,8 @@ const booksAdapter = createEntityAdapter<IBook>();
 const initialState = booksAdapter.getInitialState({
     status: "idle",
     isLoaded: false,
-    selectedCategoryId: null as number | null
+    selectedCategoryId: null as number | null,
+    selectedCategoryName: null as string | null
 });
 
 export const bookSlice = createSlice({
@@ -60,9 +60,11 @@ export const bookSlice = createSlice({
     reducers: {
         setSelectedCategory: (state, action) => {
             state.selectedCategoryId = action.payload;
+            state.selectedCategoryName = action.payload;
         },
         clearSelectedCategory: (state) => {
             state.selectedCategoryId = null;
+            state.selectedCategoryName = null;
         }
     },
     extraReducers: (builder => {
@@ -137,23 +139,17 @@ export const { setSelectedCategory, clearSelectedCategory } =
     bookSlice.actions;
 
 export const selectBooksByCategory = createSelector(
-  [selectAllBooks, (state: RootState) => state.book.selectedCategoryId],
-  (books, selectedCategoryId) => {
-
-    let filtered = books.filter(book => book.isActive);
-
-    if (!selectedCategoryId) return filtered;
-
-    return filtered.filter(
-      (book) => book.categoryId === selectedCategoryId
-    );
+  [
+    selectAllBooks,
+    (state: RootState) => state.book.selectedCategoryId,
+    (state: RootState) => state.category.entities  
+  ],
+  (books, selectedCategoryId, categoryEntities) => {
+    if (!selectedCategoryId) return books;
+    const categoryName = categoryEntities[selectedCategoryId]?.name;
+    return books.filter((book) => book.categoryName === categoryName);
   }
 );
-
-export const selectAllCategories = (state: RootState): ICategory[] => {
-  const categoryState = state.category; 
-  return categoryState.ids.map(id => categoryState.entities[id]!);
-};
 
 export const selectLowStockBooks = createSelector(
     [selectAllBooks],

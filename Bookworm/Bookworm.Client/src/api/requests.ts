@@ -107,6 +107,9 @@ const Comment = {
 
 const Rating = {
     listByBook: (bookId: number) => queries.get(`rating/book/${bookId}`),
+    add :(bookId: number, score:number) => queries.post("rating", { bookId, score }),
+    update:(ratingId:number, score:number)=> queries.put(`rating/${ratingId}`, { score }),
+    delete:(ratingId:number) => queries.delete(`rating/${ratingId}`)
 }
 
 const requests = {

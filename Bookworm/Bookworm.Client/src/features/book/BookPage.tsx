@@ -17,7 +17,7 @@ export default function BookPage() {
     useEffect(() => {
     if (!isLoaded) dispatch(fetchBooks());
     dispatch(fetchCategories());
-}, [isLoaded, dispatch]);
+}, [dispatch]);
 
     if (status === "pendingFetchBooks")
         return <CircularProgress />;
