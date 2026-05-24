@@ -686,3 +686,5 @@ FodyWeavers.xsd
 
 
 # End of https://mrkandreev.name/snippets/gitignore-generator/#react,DotnetCore,ASPNETCore,VisualStudio
+
+appsettings.Development.json
