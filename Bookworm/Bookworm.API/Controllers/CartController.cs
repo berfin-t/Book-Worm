@@ -18,7 +18,7 @@ public class CartController : ControllerBase
 
     private string GetCustomerId()
     {
-        return User.Identity?.Name ?? Request.Cookies["customerId"]!;
+        return User.Identity?.Name ?? Request.Cookies["customerId"];
     }
 
     [HttpGet]
@@ -62,22 +62,37 @@ public class CartController : ControllerBase
         return BadRequest(new ProblemDetails { Title = "The book can not be removed from cart"});
     }
 
-    private async Task<Cart> GetOrCreate(string custId)
-    {
-        var cart = await _context.Carts
-        .Include(c => c.CartItems)
-        .ThenInclude(c => c.Book)
-        .FirstOrDefaultAsync(c => c.CustomerId == custId);
+    private async Task<Cart> GetOrCreate(string? custId)
+{
+    Cart? cart = null;
 
-        if (cart == null)
+    if (!string.IsNullOrEmpty(custId))
     {
-        cart = new Cart { CustomerId = custId };
+        cart = await _context.Carts
+            .Include(c => c.CartItems)
+            .ThenInclude(c => c.Book)
+            .FirstOrDefaultAsync(c => c.CustomerId == custId);
+    }
+
+    if (cart == null)
+    {
+        var newCustomerId = Guid.NewGuid().ToString();
+
+        var cookieOptions = new CookieOptions
+        {
+            Expires = DateTime.Now.AddMonths(1),
+            IsEssential = true
+        };
+
+        Response.Cookies.Append("customerId", newCustomerId, cookieOptions);
+
+        cart = new Cart { CustomerId = newCustomerId };
         _context.Carts.Add(cart);
         await _context.SaveChangesAsync();
     }
 
     return cart;
-    }
+}
 
     private CartDto CartToDto(Cart cart)
     {

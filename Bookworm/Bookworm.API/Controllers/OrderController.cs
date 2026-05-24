@@ -2,6 +2,8 @@ using Bookworm.API.Data;
 using Bookworm.API.Dtos;
 using Bookworm.API.Entity;
 using Bookworm.API.Extensions;
+using Bookworm.API.Services;
+using Hangfire;
 using Iyzipay;
 using Iyzipay.Model;
 using Iyzipay.Request;
@@ -13,15 +15,17 @@ namespace Bookworm.API.Controller;
 
 [ApiController]
 [Route("api/[controller]")]
-public class OrderController: ControllerBase
+public class OrderController : ControllerBase
 {
     private readonly DataContext _context;
     private readonly IConfiguration _config;
+    private readonly EmailService _emailService;
 
-    public OrderController (DataContext context, IConfiguration config)
+    public OrderController(DataContext context, IConfiguration config, EmailService emailService)
     {
         _context = context;
         _config = config;
+        _emailService = emailService;
     }
 
     #region Get Orders
@@ -30,10 +34,10 @@ public class OrderController: ControllerBase
     public async Task<ActionResult<List<OrderDto>>> GetOrder()
     {
         return await _context.Orders
-        .Include(i=>i.OrderItems)
-        .OrderToDto()
-        .Where(i=>i.CustomerId==User.Identity!.Name)
-        .ToListAsync();
+            .Include(i => i.OrderItems)
+            .OrderToDto()
+            .Where(i => i.CustomerId == User.Identity!.Name)
+            .ToListAsync();
     }
     #endregion
 
@@ -43,92 +47,117 @@ public class OrderController: ControllerBase
     public async Task<ActionResult<List<OrderDto>>> GetOrderByAdmin()
     {
         return await _context.Orders
-        .Include(i=>i.OrderItems)
-        .OrderToDto()
-        .ToListAsync();
+            .Include(i => i.OrderItems)
+            .OrderToDto()
+            .ToListAsync();
     }
     #endregion
 
     #region Get Order
     [HttpGet("{id}")]
     [Authorize(Roles = "Customer")]
-        public async Task<ActionResult<OrderDto?>> GetOrder(int id)
-        {
-            return await _context.Orders
-                        .Include(i => i.OrderItems)
-                        .OrderToDto()
-                        .Where(i => i.CustomerId == User.Identity!.Name && i.Id == id)
-                        .FirstOrDefaultAsync();
-        }
+    public async Task<ActionResult<OrderDto?>> GetOrder(int id)
+    {
+        return await _context.Orders
+            .Include(i => i.OrderItems)
+            .OrderToDto()
+            .Where(i => i.CustomerId == User.Identity!.Name && i.Id == id)
+            .FirstOrDefaultAsync();
+    }
     #endregion
 
+    #region Dashboard Stats
     [HttpGet("stats")]
     public async Task<IActionResult> GetDashboardStats()
     {
-        
-    var stats = new
-    {
-        totalOrders = await _context.Orders.CountAsync(),
-        todaysOrders = await _context.Orders
-    .CountAsync(o => o.CreatedAt.HasValue &&
-                     o.CreatedAt.Value.Date == DateTime.UtcNow.Date),
-        totalUsers = await _context.Users.CountAsync(),
-        pendingOrders = await _context.Orders
-            .Where(o => o.OrderStatus == OrderStatus.Pending)
-            .CountAsync(),
-        totalRevenue = await _context.Orders
-            .Where(o => o.OrderStatus == OrderStatus.Completed)
-            .SumAsync(o => o.SubTotal + o.DeliveryFree)
-    };
+        var stats = new
+        {
+            totalOrders = await _context.Orders.CountAsync(),
+            todaysOrders = await _context.Orders
+                .CountAsync(o => o.CreatedAt.HasValue &&
+                                 o.CreatedAt.Value.Date == DateTime.UtcNow.Date),
+            totalUsers = await _context.Users.CountAsync(),
+            pendingOrders = await _context.Orders
+                .Where(o => o.OrderStatus == OrderStatus.Pending)
+                .CountAsync(),
+            totalRevenue = await _context.Orders
+                .Where(o => o.OrderStatus == OrderStatus.Completed)
+                .SumAsync(o => o.SubTotal + o.DeliveryFree)
+        };
 
-    return Ok(stats);
-}
+        return Ok(stats);
+    }
+    #endregion
 
     #region Update Order Status
-[HttpPatch("{id}/update-status")]
-[Authorize(Roles = "Admin")]
-public async Task<ActionResult> UpdateOrderStatus(int id, [FromBody] UpdateOrderStatusDto dto)
-{
-    var order = await _context.Orders.FindAsync(id);
-    if (order == null) return NotFound();
-
-    var newStatus = (OrderStatus)dto.OrderStatus;
-
-    // Business Rules — geçersiz geçişleri engelle
-    var invalidTransition = (order.OrderStatus, newStatus) switch
+    [HttpPatch("{id}/update-status")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> UpdateOrderStatus(int id, [FromBody] UpdateOrderStatusDto dto)
     {
-        (not OrderStatus.Shipped, OrderStatus.Completed) =>
-            "Sipariş önce 'Kargoya Verildi' durumuna alınmalıdır.",
-        (OrderStatus.Completed, _) =>
-            "Tamamlanmış sipariş güncellenemez.",
-        (OrderStatus.Cancelled, _) =>
-            "İptal edilmiş sipariş güncellenemez.",
-        _ => null
-    };
+        var order = await _context.Orders.FindAsync(id);
+        if (order == null) return NotFound();
 
-    if (invalidTransition != null)
-        return BadRequest(new ProblemDetails { Title = invalidTransition });
+        var newStatus = (OrderStatus)dto.OrderStatus;
 
-    // Kargoya Verildi → takip numarası üret
-    if (newStatus == OrderStatus.Shipped && string.IsNullOrEmpty(order.TrackingNumber))
-        order.TrackingNumber = GenerateTrackingNumber();
+        var invalidTransition = (order.OrderStatus, newStatus) switch
+        {
+            (not OrderStatus.Shipped, OrderStatus.Completed) =>
+                "Sipariş önce 'Kargoya Verildi' durumuna alınmalıdır.",
+            (OrderStatus.Completed, _) =>
+                "Tamamlanmış sipariş güncellenemez.",
+            (OrderStatus.Cancelled, _) =>
+                "İptal edilmiş sipariş güncellenemez.",
+            _ => null
+        };
 
-    order.OrderStatus = newStatus;
+        if (invalidTransition != null)
+            return BadRequest(new ProblemDetails { Title = invalidTransition });
 
-    var result = await _context.SaveChangesAsync() > 0;
+        if (newStatus == OrderStatus.Shipped && string.IsNullOrEmpty(order.TrackingNumber))
+            order.TrackingNumber = GenerateTrackingNumber();
 
-    if (result) return Ok(new { trackingNumber = order.TrackingNumber });
+        order.OrderStatus = newStatus;
 
-    return BadRequest(new ProblemDetails { Title = "Problem updating order status" });
-}
+        var result = await _context.SaveChangesAsync() > 0;
 
-private static string GenerateTrackingNumber()
-{
-    var timestamp = DateTime.UtcNow.ToString("yyMMddHHmm");
-    var random = Random.Shared.Next(1000, 9999);
-    return $"TRK-{timestamp}-{random}";
-}
-#endregion
+        if (result)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == order.CustomerId);
+
+            if (user != null && !string.IsNullOrEmpty(user.Email))
+            {
+                var statusText = newStatus switch
+                {
+                    OrderStatus.Approved => "Onaylandı ✅",
+                    OrderStatus.Shipped => $"Kargoya Verildi 🚚 (Takip No: {order.TrackingNumber})",
+                    OrderStatus.Completed => "Tamamlandı 🎉",
+                    OrderStatus.Cancelled => "İptal Edildi ❌",
+                    _ => newStatus.ToString()
+                };
+
+                BackgroundJob.Enqueue<EmailService>(service =>
+                    service.SendOrderStatusUpdateAsync(
+                        user.Email,
+                        user.Name ?? user.UserName!,
+                        order.Id,
+                        statusText
+                    )
+                );
+            }
+
+            return Ok(new { trackingNumber = order.TrackingNumber });
+        }
+
+        return BadRequest(new ProblemDetails { Title = "Problem updating order status" });
+    }
+
+    private static string GenerateTrackingNumber()
+    {
+        var timestamp = DateTime.UtcNow.ToString("yyMMddHHmm");
+        var random = Random.Shared.Next(1000, 9999);
+        return $"TRK-{timestamp}-{random}";
+    }
+    #endregion
 
     #region Create Order
     [HttpPost]
@@ -136,12 +165,12 @@ private static string GenerateTrackingNumber()
     public async Task<ActionResult<Order>> CreateOrder(CreateOrderDto createOrderDto)
     {
         var cart = await _context.Carts
-        .Include(i=>i.CartItems)
-        .ThenInclude(i=>i.Book)
-        .Where(i=>i.CustomerId== User.Identity!.Name)
-        .FirstOrDefaultAsync();
+            .Include(i => i.CartItems)
+            .ThenInclude(i => i.Book)
+            .Where(i => i.CustomerId == User.Identity!.Name)
+            .FirstOrDefaultAsync();
 
-        if(cart==null) return BadRequest(new ProblemDetails{Title="Problem getting cart"});
+        if (cart == null) return BadRequest(new ProblemDetails { Title = "Problem getting cart" });
 
         var items = new List<Entity.OrderItem>();
 
@@ -162,116 +191,132 @@ private static string GenerateTrackingNumber()
             book.Stock -= item.Quantity;
         }
 
-        var subTotal = items.Sum(i=>i.Price * i.Quantity);
+        var subTotal = items.Sum(i => i.Price * i.Quantity);
         var deliveryFree = 0;
 
         var order = new Order
-            {
-                OrderItems = items,
-                CustomerId = User.Identity!.Name,
-                FirstName = createOrderDto.FirstName,
-                LastName = createOrderDto.LastName,
-                Phone = createOrderDto.Phone,
-                City = createOrderDto.City,
-                AddresLine = createOrderDto.AddresLine,
-                SubTotal = subTotal,
-                DeliveryFree = deliveryFree
-            };
+        {
+            OrderItems = items,
+            CustomerId = User.Identity!.Name,
+            FirstName = createOrderDto.FirstName,
+            LastName = createOrderDto.LastName,
+            Phone = createOrderDto.Phone,
+            City = createOrderDto.City,
+            AddresLine = createOrderDto.AddresLine,
+            SubTotal = subTotal,
+            DeliveryFree = deliveryFree
+        };
 
-            var paymentResult = await ProcessPayment(createOrderDto, cart);
-            
-            if (paymentResult.Status == "failure")
+        var paymentResult = await ProcessPayment(createOrderDto, cart);
+
+        if (paymentResult.Status == "failure")
+            return BadRequest(new ProblemDetails { Title = paymentResult.ErrorMessage });
+
+        order.ConversationId = paymentResult.ConversationId;
+        order.BasketId = paymentResult.BasketId;
+
+        _context.Orders.Add(order);
+        _context.Carts.Remove(cart);
+
+        var result = await _context.SaveChangesAsync() > 0;
+
+        if (result)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
+            if (user != null && !string.IsNullOrEmpty(user.Email))
             {
-                return BadRequest(new ProblemDetails { Title = paymentResult.ErrorMessage });
+                BackgroundJob.Enqueue<EmailService>(service =>
+                    service.SendOrderConfirmationAsync(
+                        user.Email,
+                        user.Name ?? user.UserName!,
+                        order.Id
+                    )
+                );
+            }
+            else
+            {
+                Console.WriteLine($"Mail gönderilemedi: user={user?.UserName}, email={user?.Email}");
             }
 
-            order.ConversationId = paymentResult.ConversationId;
-            order.BasketId = paymentResult.BasketId;
+            return CreatedAtAction(nameof(GetOrder), new { id = order.Id }, order.Id);
+        }
 
-            _context.Orders.Add(order);
-            _context.Carts.Remove(cart);
-
-            var result = await _context.SaveChangesAsync() > 0;
-
-            if(result)
-                return CreatedAtAction(nameof(GetOrder), new {id = order.Id}, order.Id);
-            
-            return BadRequest(new ProblemDetails { Title = "Problem getting order" });
+        return BadRequest(new ProblemDetails { Title = "Problem getting order" });
     }
     #endregion
 
     #region Process Payment
     private async Task<Payment> ProcessPayment(CreateOrderDto createOrderDto, Cart cart)
+    {
+        Options options = new Options();
+        options.ApiKey = _config["PaymentAPI:APIKey"];
+        options.SecretKey = _config["PaymentAPI:SecretKey"];
+        options.BaseUrl = "https://sandbox-api.iyzipay.com";
+
+        CreatePaymentRequest request = new CreatePaymentRequest();
+        request.Locale = Locale.TR.ToString();
+        request.ConversationId = Guid.NewGuid().ToString();
+        request.Price = cart.CalculateTotal().ToString();
+        request.PaidPrice = cart.CalculateTotal().ToString();
+        request.Currency = Currency.TRY.ToString();
+        request.Installment = 1;
+        request.BasketId = cart.CartId.ToString();
+        request.PaymentChannel = PaymentChannel.WEB.ToString();
+        request.PaymentGroup = PaymentGroup.PRODUCT.ToString();
+
+        PaymentCard paymentCard = new PaymentCard();
+        paymentCard.CardHolderName = createOrderDto.CardName;
+        paymentCard.CardNumber = createOrderDto.CardNumber;
+        paymentCard.ExpireMonth = createOrderDto.CardExpireMonth;
+        paymentCard.ExpireYear = createOrderDto.CardExpireYear;
+        paymentCard.Cvc = createOrderDto.CardCvc;
+        paymentCard.RegisterCard = 0;
+        request.PaymentCard = paymentCard;
+
+        Buyer buyer = new Buyer();
+        buyer.Id = "BY789";
+        buyer.Name = createOrderDto.FirstName;
+        buyer.Surname = createOrderDto.LastName;
+        buyer.GsmNumber = createOrderDto.Phone;
+        buyer.Email = "email@email.com";
+        buyer.IdentityNumber = "74300864791";
+        buyer.LastLoginDate = "2015-10-05 12:43:35";
+        buyer.RegistrationDate = "2013-04-21 15:12:09";
+        buyer.RegistrationAddress = createOrderDto.AddresLine;
+        buyer.Ip = "85.34.78.112";
+        buyer.City = createOrderDto.City;
+        buyer.Country = "Türkiye";
+        buyer.ZipCode = "34732";
+        request.Buyer = buyer;
+
+        Address shippingAddress = new Address();
+        shippingAddress.ContactName = createOrderDto.FirstName + " " + createOrderDto.LastName;
+        shippingAddress.City = createOrderDto.City;
+        shippingAddress.Country = "Türkiye";
+        shippingAddress.Description = createOrderDto.AddresLine;
+        shippingAddress.ZipCode = "34742";
+
+        request.ShippingAddress = shippingAddress;
+        request.BillingAddress = shippingAddress;
+
+        List<BasketItem> basketItems = new List<BasketItem>();
+
+        foreach (var item in cart.CartItems)
         {
-            Options options = new Options();
-            options.ApiKey = _config["PaymentAPI:APIKey"];
-            options.SecretKey = _config["PaymentAPI:SecretKey"];
-
-            options.BaseUrl = "https://sandbox-api.iyzipay.com";
-
-            CreatePaymentRequest request = new CreatePaymentRequest();
-            request.Locale = Locale.TR.ToString();
-            request.ConversationId = Guid.NewGuid().ToString();
-            request.Price = cart.CalculateTotal().ToString();
-            request.PaidPrice = cart.CalculateTotal().ToString();
-            request.Currency = Currency.TRY.ToString();
-            request.Installment = 1;
-            request.BasketId = cart.CartId.ToString();
-            request.PaymentChannel = PaymentChannel.WEB.ToString();
-            request.PaymentGroup = PaymentGroup.PRODUCT.ToString();
-
-            PaymentCard paymentCard = new PaymentCard();
-            paymentCard.CardHolderName = createOrderDto.CardName;
-            paymentCard.CardNumber = createOrderDto.CardNumber;
-            paymentCard.ExpireMonth = createOrderDto.CardExpireMonth;
-            paymentCard.ExpireYear = createOrderDto.CardExpireYear;
-            paymentCard.Cvc = createOrderDto.CardCvc;
-            paymentCard.RegisterCard = 0;
-            request.PaymentCard = paymentCard;
-
-            Buyer buyer = new Buyer();
-            buyer.Id = "BY789";
-            buyer.Name = createOrderDto.FirstName;
-            buyer.Surname = createOrderDto.LastName;
-            buyer.GsmNumber = createOrderDto.Phone;
-            buyer.Email = "email@email.com";
-            buyer.IdentityNumber = "74300864791";
-            buyer.LastLoginDate = "2015-10-05 12:43:35";
-            buyer.RegistrationDate = "2013-04-21 15:12:09";
-            buyer.RegistrationAddress = createOrderDto.AddresLine;
-            buyer.Ip = "85.34.78.112";
-            buyer.City = createOrderDto.City;
-            buyer.Country = "Türkiye";
-            buyer.ZipCode = "34732";
-            request.Buyer = buyer;
-
-            Address shippingAddress = new Address();
-            shippingAddress.ContactName = createOrderDto.FirstName + " " + createOrderDto.LastName;
-            shippingAddress.City = createOrderDto.City;
-            shippingAddress.Country = "Türkiye";
-            shippingAddress.Description = createOrderDto.AddresLine;
-            shippingAddress.ZipCode = "34742";
-
-            request.ShippingAddress = shippingAddress;
-            request.BillingAddress = shippingAddress;
-
-            List<BasketItem> basketItems = new List<BasketItem>();
-
-            foreach (var item in cart.CartItems)
-            {
-                BasketItem basketItem = new BasketItem();
-                basketItem.Id = item.BookId.ToString();
-                basketItem.Name = item.Book.Title;
-                basketItem.Category1 = "Saat";
-                basketItem.ItemType = BasketItemType.PHYSICAL.ToString();
-                basketItem.Price = (item.Book.Price * item.Quantity).ToString();
-                basketItems.Add(basketItem);
-            }
-
-            request.BasketItems = basketItems;
-
-            return await Payment.Create(request, options);
+            BasketItem basketItem = new BasketItem();
+            basketItem.Id = item.BookId.ToString();
+            basketItem.Name = item.Book.Title;
+            basketItem.Category1 = "Saat";
+            basketItem.ItemType = BasketItemType.PHYSICAL.ToString();
+            basketItem.Price = (item.Book.Price * item.Quantity).ToString();
+            basketItems.Add(basketItem);
         }
+
+        request.BasketItems = basketItems;
+
+        return await Payment.Create(request, options);
+    }
     #endregion
 
     #region Get Total Order Count

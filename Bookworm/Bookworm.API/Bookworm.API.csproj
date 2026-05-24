@@ -7,7 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+  <PackageReference Include="Hangfire.AspNetCore" Version="1.8.23" />
+  <PackageReference Include="Hangfire.PostgreSql" Version="1.21.1" />
   <PackageReference Include="Iyzipay" Version="2.1.78" />
+  <PackageReference Include="MailKit" Version="4.16.0" />
   <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
@@ -16,6 +19,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="MimeKit" Version="4.16.0" />
 <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
