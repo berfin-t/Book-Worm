@@ -7,6 +7,7 @@
 ![Material UI](https://img.shields.io/badge/Material%20UI-MUI-007FFF?logo=mui&logoColor=white)
 ![Redux Toolkit](https://img.shields.io/badge/Redux-Toolkit-764ABC?logo=redux&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-Authentication-black?logo=jsonwebtokens)
+![Hangfire](https://img.shields.io/badge/Hangfire-Background%20Jobs-darkblue)
 ![License](https://img.shields.io/badge/License-MIT-success)
 
 ## 📖 About the Project
@@ -22,6 +23,8 @@ The frontend and backend are developed as fully decoupled applications.
 - ASP.NET Core Web API
 - Entity Framework Core
 - ASP.NET Identity & JWT Authentication
+- Hangfire (Background Job Processing)
+- MailKit / MimeKit (Email Service)
 
 ### Frontend
 - React.js
@@ -67,6 +70,26 @@ The frontend and backend are developed as fully decoupled applications.
 
 ![Orders](screenshots/8.png)
 
+### 📧 Email Notifications
+Automated email notifications are sent to customers via **Hangfire background jobs**:
+
+- ✅ **Order Confirmation** – Sent immediately after a successful order is placed
+- 🔄 **Order Status Updates** – Sent whenever an admin updates the order status:
+  - Onaylandı ✅
+  - Kargoya Verildi 🚚 (includes tracking number)
+  - Tamamlandı 🎉
+  - İptal Edildi ❌
+
+ <img width="767" height="727" alt="image" src="https://github.com/user-attachments/assets/46226b53-d22e-42b3-b1b3-92887af79b79" />
+
+Emails are processed **asynchronously in the background** — the API response is not blocked by the email sending process. Failed jobs are automatically retried up to 10 times.
+
+### ⚙️ Hangfire Dashboard
+The Hangfire dashboard is available at `/hangfire` and provides:
+- Real-time job monitoring
+- Succeeded / failed / retrying job history
+- Manual job triggering
+
 ### ⭐ Rating Features
 - Users can rate books from 1 to 5 stars
 - Real-time average rating calculation
@@ -84,7 +107,7 @@ The frontend and backend are developed as fully decoupled applications.
   - Comment content
   - Creation date
 - Integrated with rating system:
-  - User’s rating is displayed alongside their comment
+  - User's rating is displayed alongside their comment
 
 📸 Example:
 ![Orders](screenshots/13.png)
@@ -174,6 +197,8 @@ Admins can update order status dynamically:
 - Cancelled (İptal Edildi)
 - Payment Failed (Ödeme Başarısız)
 
+> 📧 An automated email is sent to the customer on every status change.
+
 📸 Example:
 ![Order Detail](screenshots/12.png)
 
@@ -188,7 +213,9 @@ API
  ├── Dtos
  ├── Entity
  ├── Data (DbContext)
- ├── Services 
+ ├── Services
+ │   ├── TokenService
+ │   └── EmailService (Hangfire + MailKit)
  └── Extensions
 ```
 
@@ -211,7 +238,7 @@ src
 
 ### Prerequisites
 - .NET SDK 9.0 or higher
-- nmp and yarn
+- npm and yarn
 
 ---
 
@@ -223,13 +250,26 @@ git clone https://github.com/berfin-t/Book-Worm.git
 cd Bookworm
 ```
 
-#### 2. For backend
+#### 2. Configure Email Settings
+Add the following to `appsettings.json`:
+```json
+"Email": {
+  "SmtpHost": "smtp.gmail.com",
+  "SmtpPort": "587",
+  "From": "your-email@gmail.com",
+  "Username": "your-email@gmail.com",
+  "Password": "your-app-password"
+}
+```
+> ⚠️ Use a **Gmail App Password**, not your regular Gmail password. Enable 2FA on your Google account first, then generate an App Password at https://myaccount.google.com/apppasswords
+
+#### 3. For backend
 ```sh
 cd Bookworm.API
 dotnet run
 ```
 
-#### 2. For frontend
+#### 4. For frontend
 ```sh
 cd Bookworm.Client
 npm run dev
@@ -237,7 +277,8 @@ npm run dev
 
 #### 🌐 Access the Application
 Once the services are running, open your browser and navigate to:
-- **Blazor UI:** (http://localhost:5173/)
+- **App:** http://localhost:5173/
+- **Hangfire Dashboard:** http://localhost:5000/hangfire
 
 ---
 
